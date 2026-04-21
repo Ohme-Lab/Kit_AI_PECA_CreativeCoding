@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CREATIVE CODING LAB</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header id="app-header">
+    <div id="brand">
+      <span class="logo">■</span>
+      <span class="app-title">CCL v0.1</span>
+    </div>
+
+    <div id="level-title-wrap">
+      <span id="level-title">01 / hello, canvas</span>
+    </div>
+
+    <div id="playback-controls">
+      <button id="btn-play"  class="ctrl-btn">play</button>
+      <button id="btn-pause" class="ctrl-btn active">pause</button>
+      <button id="btn-step"  class="ctrl-btn">step</button>
+      <div id="speed-wrap">
+        <label for="speed-slider">spd:</label>
+        <input type="range" id="speed-slider" min="1" max="60" value="12">
+        <span id="speed-label">12 fps</span>
+      </div>
+    </div>
+
+    <div id="header-progress">
+      <div id="progress-track"><div id="progress-fill"></div></div>
+      <span id="progress-label">1 / 5</span>
+    </div>
+
+    <div id="level-nav">
+      <button id="btn-prev-level" class="ctrl-btn">&lt;</button>
+      <button id="btn-next-level" class="ctrl-btn">&gt;</button>
+    </div>
+  </header>
+
+  <!-- ── Three panes ── -->
+  <main id="app-main">
+
+    <!-- Pane 1 – Context (narrative / blocks / AI) -->
+    <section class="pane" id="pane-left">
+      <div class="pane-header">
+        <span class="pane-label">mission</span>
+      </div>
+
+      <!-- Story + task (always shown) -->
+      <div id="story-section">
+        <div id="story-text"></div>
+        <div id="task-text"></div>
+        <div id="win-message" class="win-msg hidden"></div>
+      </div>
+
+      <!-- Blockly workspace (blocks levels) -->
+      <div id="blockly-section">
+        <div id="blockly-div"></div>
+      </div>
+
+      <!-- AI button (ai-trap levels) -->
+      <div id="ai-section" class="hidden">
+        <button id="btn-ask-ai" class="ai-btn">[ ASK AI ]</button>
+        <div id="ai-log" class="ai-log hidden"></div>
+      </div>
+
+      <!-- Bug list (debug levels) -->
+      <div id="bugs-section" class="hidden">
+        <div class="section-label">// bugs to fix:</div>
+        <div id="bug-list"></div>
+        <div id="err-indicator" class="err-line"></div>
+      </div>
+
+      <!-- End screen -->
+      <div id="end-section" class="hidden">
+        <div class="end-msg">[ press any key to restart ]</div>
+      </div>
+
+    </section>
+
+    <!-- Pane 2 – Code -->
+    <section class="pane" id="pane-code">
+      <div class="pane-header">
+        <span class="pane-label">p5.js</span>
+        <div class="pane-actions">
+          <button id="btn-copy-code" class="mini-btn" onclick="navigator.clipboard.writeText(ENGINE.codeEditor.getValue())">copy</button>
+        </div>
+      </div>
+      <div id="advanced-banner" class="info-banner hidden"></div>
+      <div id="error-banner" class="error-banner hidden"></div>
+      <textarea id="code-editor"></textarea>
+    </section>
+
+    <!-- Pane 3 – Output -->
+    <section class="pane" id="pane-visual">
+      <div class="pane-header">
+        <span class="pane-label">output</span>
+        <span id="fps-display" class="fps-label">-- fps</span>
+      </div>
+      <div id="canvas-wrap">
+        <iframe id="sketch-frame" title="Live sketch"></iframe>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Scripts — order matters -->
+  <script src="https://unpkg.com/blockly@10.4.3/blockly_compressed.js"></script>
+  <script src="https://unpkg.com/blockly@10.4.3/javascript_compressed.js"></script>
+  <script src="https://unpkg.com/blockly@10.4.3/blocks_compressed.js"></script>
+  <script src="https://unpkg.com/blockly@10.4.3/msg/en.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+
+  <script src="js/blocks.js"></script>
+  <script src="js/generators.js"></script>
+  <script src="js/levels.js"></script>
+  <script src="js/runner.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

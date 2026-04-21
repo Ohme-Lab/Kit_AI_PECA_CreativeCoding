@@ -1,0 +1,342 @@
+/* ═══════════════════════════════════════════════════════════════
+   Creative Coding Lab  —  TUI game stylesheet
+   ═══════════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #080808;
+  --bg2:        #0e0e0e;
+  --bg3:        #141414;
+  --green:      #39ff14;
+  --green-hi:   #aaff88;
+  --green-dim:  #1c6b0a;
+  --green-mid:  #27a80e;
+  --green-glow: #39ff1418;
+  --amber:      #ffb300;
+  --cyan:       #00ffcc;
+  --red:        #ff3b3b;
+  --border:     #1e3a14;
+  --border-hi:  #39ff14;
+  --text:       #b8e8a8;
+  --text-dim:   #4a6a40;
+  --mono:       'Fira Code', 'Cascadia Code', 'Courier New', monospace;
+  --header-h:   34px;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--mono);
+  font-size: 12px;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  background-image: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,.07) 2px, rgba(0,0,0,.07) 4px
+  );
+}
+
+::-webkit-scrollbar       { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--green-dim); }
+
+.hidden { display: none !important; }
+
+/* ── Header ──────────────────────────────────────────────────── */
+#app-header {
+  display: flex;
+  align-items: center;
+  height: var(--header-h);
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border-hi);
+  flex-shrink: 0;
+  padding: 0;
+  gap: 0;
+}
+
+#app-header > * {
+  padding: 0 12px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid var(--border);
+}
+#app-header > *:last-child { border-right: none; }
+
+#brand         { gap: 6px; }
+.logo          { color: var(--green); font-size: 14px; }
+.app-title     { color: var(--green); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+
+#level-title-wrap { flex: 1; }
+#level-title {
+  color: var(--green-hi);
+  font-size: 12px;
+  letter-spacing: .06em;
+  font-weight: 700;
+}
+
+#playback-controls { gap: 4px; }
+
+button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size: 11px; }
+
+.ctrl-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 2px 8px;
+  letter-spacing: .04em;
+  transition: color .1s, border-color .1s, background .1s;
+}
+.ctrl-btn::before { content: '['; color: var(--green-dim); }
+.ctrl-btn::after  { content: ']'; color: var(--green-dim); }
+.ctrl-btn:hover   { color: var(--green); border-color: var(--green-mid); }
+.ctrl-btn.active  { background: var(--green); color: var(--bg); border-color: var(--green); }
+.ctrl-btn.active::before,
+.ctrl-btn.active::after { color: var(--bg); }
+
+#speed-wrap { gap: 5px; color: var(--text-dim); font-size: 11px; }
+#speed-slider { width: 60px; accent-color: var(--green); cursor: pointer; }
+#speed-label  { min-width: 44px; color: var(--green-mid); }
+
+/* progress bar in header */
+#header-progress {
+  gap: 8px;
+  min-width: 130px;
+}
+#progress-track {
+  flex: 1;
+  height: 6px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+}
+#progress-fill {
+  height: 100%;
+  background: var(--green-dim);
+  transition: width .4s;
+}
+#progress-label { font-size: 10px; color: var(--text-dim); white-space: nowrap; }
+
+#level-nav { gap: 2px; }
+
+/* ── Three-pane layout ───────────────────────────────────────── */
+#app-main {
+  display: flex;
+  height: calc(100vh - var(--header-h));
+  overflow: hidden;
+}
+
+.pane {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.pane:last-child { border-right: none; }
+
+#pane-left   { width: 28%; min-width: 220px; }
+#pane-code   { width: 38%; min-width: 240px; }
+#pane-visual { flex: 1; min-width: 200px; }
+
+.pane-header {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.pane-header::before,
+.pane-header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.pane-label {
+  padding: 0 10px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--green);
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  white-space: nowrap;
+}
+.pane-actions { display: flex; border-left: 1px solid var(--border); height: 100%; }
+.mini-btn {
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 0 8px;
+  font-size: 10px;
+  height: 100%;
+  cursor: pointer;
+}
+.mini-btn:hover { color: var(--green); background: var(--green-glow); }
+
+/* ── Left pane sections ──────────────────────────────────────── */
+#story-section {
+  padding: 14px 12px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.story-line {
+  color: var(--text);
+  line-height: 1.9;
+  font-size: 11px;
+  white-space: pre-wrap;
+}
+#task-text {
+  margin-top: 10px;
+  color: var(--text-dim);
+  font-size: 10px;
+  line-height: 1.7;
+  border-top: 1px dashed var(--border);
+  padding-top: 8px;
+}
+
+.win-msg {
+  margin-top: 10px;
+  color: var(--green);
+  font-size: 11px;
+  line-height: 1.8;
+  background: var(--green-glow);
+  border: 1px solid var(--green-dim);
+  padding: 8px 10px;
+}
+.win-msg::before { content: '> '; color: var(--green-dim); }
+
+/* Blockly fills remaining height */
+#blockly-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+#blockly-div { flex: 1; overflow: hidden; }
+
+/* AI trap section */
+#ai-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px;
+}
+
+.ai-btn {
+  background: var(--bg3);
+  border: 2px solid var(--green);
+  color: var(--green);
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 700;
+  padding: 14px 28px;
+  cursor: pointer;
+  letter-spacing: .12em;
+  transition: background .15s;
+  /* pulse to draw attention */
+  animation: pulse-border 2s ease-in-out infinite;
+}
+.ai-btn:hover    { background: var(--green); color: var(--bg); animation: none; }
+.ai-btn:disabled { opacity: .5; cursor: default; animation: none; }
+
+@keyframes pulse-border {
+  0%,100% { box-shadow: 0 0 0 0 #39ff1440; }
+  50%     { box-shadow: 0 0 0 8px #39ff1400; }
+}
+
+.ai-log {
+  width: 100%;
+  color: var(--text-dim);
+  font-size: 10px;
+  line-height: 1.8;
+  max-height: 100px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  padding: 6px 8px;
+  background: var(--bg3);
+}
+
+/* Bug list section */
+#bugs-section {
+  padding: 10px 12px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+}
+.section-label {
+  color: var(--text-dim);
+  font-size: 10px;
+  margin-bottom: 8px;
+}
+.bug-item {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  font-size: 10px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  transition: color .2s;
+}
+.bug-status { color: var(--red); flex-shrink: 0; }
+.bug-item.bug-fixed { color: var(--green-mid); }
+.bug-item.bug-fixed .bug-status { color: var(--green); }
+.err-line { font-size: 10px; color: var(--red); margin-top: 6px; min-height: 14px; }
+
+/* End section */
+#end-section {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  padding: 16px 12px;
+}
+.end-msg { color: var(--text-dim); font-size: 10px; }
+
+/* ── Code pane ───────────────────────────────────────────────── */
+#pane-code { position: relative; }
+
+.info-banner, .error-banner {
+  font-size: 10px;
+  padding: 3px 10px;
+  flex-shrink: 0;
+}
+.info-banner  { background: #ffb30010; border-bottom: 1px solid var(--amber); color: var(--amber); }
+.error-banner { background: #ff3b3b10; border-bottom: 1px solid var(--red);   color: var(--red);   }
+
+.CodeMirror {
+  font-family: var(--mono) !important;
+  font-size: 11px;
+  line-height: 1.65;
+  background: var(--bg) !important;
+}
+.CodeMirror-gutters    { background: var(--bg2) !important; border-right: 1px solid var(--border) !important; }
+.CodeMirror-linenumber { color: var(--green-dim) !important; }
+.CodeMirror-cursor     { border-left: 2px solid var(--green) !important; }
+.cm-s-dracula.CodeMirror { background: var(--bg) !important; }
+.cm-s-dracula .CodeMirror-gutters { background: var(--bg2) !important; }
+
+/* ── Output pane ─────────────────────────────────────────────── */
+#canvas-wrap {
+  flex: 1;
+  background: var(--bg);
+  overflow: hidden;
+}
+#sketch-frame { border: none; width: 100%; height: 100%; display: block; }
+.fps-label { font-size: 10px; color: var(--text-dim); margin-left: auto; padding-right: 6px; }
+
+/* ── Misc animations ─────────────────────────────────────────── */
+@keyframes blink { 0%,100% { opacity:1 } 50% { opacity:0 } }
+
+/* readonly CodeMirror slightly dimmed */
+.CodeMirror.CodeMirror-readonly { opacity: .75; }
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 800px) {
+  #app-main   { flex-direction: column; }
+  .pane       { width: 100% !important; height: 33.3%; border-right: none; border-bottom: 1px solid var(--border); }
+}
