@@ -113,6 +113,7 @@ const ENGINE = {
   code: '',
   aiUsed: false,
   loading: false,
+  stepPassed: false,
 };
 
 /* ── Returns the active step object (or level itself if no steps) ── */
@@ -126,7 +127,7 @@ function engineCurrentStep() {
 /* ── Start a level ──────────────────────────────────────────── */
 function engineLoad(index) {
   ENGINE.levelIndex = index;
-  ENGINE.stepIndex  = 0;
+  ENGINE.stepIndex  = 6;
   ENGINE.level      = LEVELS[index];
   document.getElementById('btn-next-level').classList.remove('active');
   document.getElementById('level-title').textContent = ENGINE.level.title;
@@ -146,7 +147,8 @@ function engineLoad(index) {
 
 /* ── Load a step (called on level start and every step advance) ── */
 function engineLoadStep(step) {
-  ENGINE.aiUsed = false;
+  ENGINE.aiUsed     = false;
+  ENGINE.stepPassed = false;
 
   setNarrative(step.story, step.task);
   updateStepIndicator();
@@ -164,10 +166,9 @@ function engineLoadStep(step) {
     blocksSection.classList.remove('hidden');
     ENGINE.workspace.updateToolbox(TOOLBOXES[step.toolbox] || TOOLBOXES.basic);
     ENGINE.codeEditor.setOption('readOnly', true);
+    
   } else if (step.type === 'code') {
     ENGINE.codeEditor.setOption('readOnly', false);
-
-
 
    } else if (step.type === 'ai-trap') {
     aiSection.classList.remove('hidden');
@@ -178,10 +179,15 @@ function engineLoadStep(step) {
     log.innerHTML = '';
     log.classList.add('hidden');
     ENGINE.codeEditor.setOption('readOnly', true);
+
   } else if (step.type === 'debug') {
-    ENGINE.codeEditor.setValue(step.aiCode || '');
+    const debugCode = typeof step.aiCode === 'function'
+      ? step.aiCode(ENGINE.codeEditor.getValue())
+      : (step.aiCode || '');
+    ENGINE.codeEditor.setValue(debugCode);
     ENGINE.codeEditor.setOption('readOnly', false);
-    runnerRun(ENGINE.codeEditor.getValue());
+    runnerRun(debugCode);
+
   } else if (step.type === 'end') {
     endSection.classList.remove('hidden');
     ENGINE.codeEditor.setOption('readOnly', true);
@@ -209,38 +215,18 @@ function engineOnCodeChange(code) {
 
 /* ── Check win condition ────────────────────────────────────── */
 function engineCheck() {
-  if (ENGINE.loading) return;
+  if (ENGINE.loading || ENGINE.stepPassed) return;
   const lv = ENGINE.level;
   if (!lv) return;
   const step = engineCurrentStep();
-  const passed = step.check(ENGINE.blocks, ENGINE.code, ENGINE);
-  if (passed) engineStepPass();
-}
-
-function engineStepPass() {
-  const lv       = ENGINE.level;
-  const step     = engineCurrentStep();
-  const hasSteps = lv.steps?.length > 0;
-
-  if (hasSteps && ENGINE.stepIndex < lv.steps.length - 1) {
-    // intermediate step: show win message, then load next step
-    if (step.win) showWinMessage(step.win);
-    ENGINE.stepIndex++;
-    engineLoadStep(engineCurrentStep());
-  } else {
-    // last step: show step win briefly, then level win + unlock button
-    if (step.win) {
-      showWinMessage(step.win);
-      setTimeout(engineWin, 4800);
-    } else {
-      engineWin();
-    }
-  }
+  if (!step.check(ENGINE.blocks, ENGINE.code, ENGINE)) return;
+  ENGINE.stepPassed = true;
+  showWinMessage(step.win || '> done.');
 }
 
 function engineWin() {
   const lv = ENGINE.level;
-  if (lv.win) showWinMessage(lv.win);
+  if (lv.win) showWinMessage(lv.win, true);
   document.getElementById('btn-next-level').classList.add('active');
 }
 
@@ -385,10 +371,31 @@ function setNarrative(lines, task) {
 
 /* ── Win message ────────────────────────────────────────────── */
 let winTimer;
-function showWinMessage(msg) {
+function showWinMessage(msg, isLast = false) {
   const el = document.getElementById('win-message');
-  el.innerHTML = msg.split('\n').map(l => `<div>${l}</div>`).join('');
+  const lines = msg.split('\n').map(l => `<div>${l}</div>`).join('');
+  const lv = ENGINE.level;
+  const hasNextStep  = lv?.steps && ENGINE.stepIndex < lv.steps.length - 1;
+  const hasNextLevel = ENGINE.levelIndex < LEVELS.length - 1;
+  const btnLabel = isLast
+    ? (hasNextLevel ? 'niveau suivant' : 'fin')
+    : (hasNextStep  ? 'étape suivante' : 'niveau suivant');
+  const btn = `<button class="win-next-btn" onclick="winAdvance()">> ${btnLabel} &gt;</button>`;
+  el.innerHTML = lines + btn;
   el.classList.remove('hidden');
   clearTimeout(winTimer);
-  winTimer = setTimeout(() => el.classList.add('hidden'), 10400);
+  winTimer = setTimeout(() => el.classList.add('hidden'), 30000);
+}
+
+function winAdvance() {
+  const lv = ENGINE.level;
+  document.getElementById('win-message').classList.add('hidden');
+  const isLastStep = !lv?.steps || ENGINE.stepIndex >= lv.steps.length - 1;
+  if (!isLastStep) {
+    ENGINE.stepIndex++;
+    engineLoadStep(engineCurrentStep());
+    updateStepIndicator();
+  } else {
+    engineWin();
+  }
 }

@@ -113,7 +113,7 @@ const LEVELS = [
         win: '> Très bien. Tu changes maintenant directement le code.',
       },
       {
-        //step 7: ask ai
+        //step 7: ask ai normally
         type: 'ai-trap',
         story: [
             '> Tu peux aussi demander à l’IA de modifier un programme très simple. Ici, on lui demande un petit changement facile à vérifier.',
@@ -121,14 +121,14 @@ const LEVELS = [
         task: 'Demander à l\'IA de changer la couleur du cercle en bleu.',
 
         aiTyping: [
-          'analyzing request...',
-          'generating optimal solution...',
-          'adding best practices...',
+          'analyse de la demande...',
+          'lecture des fichiers...',
+          'génération intense...',
           'blip bloup ! J\'ai changé le code pour que le cercle soit bleu. C\'est fait !',
         ],
         aiCode: (code) => code.replace(/fill\([^)]*\)/, 'fill(0, 0, 255)'),
 
-        check: (s) => s.aiUsed === true,
+        check: (s, code, engine) => engine.aiUsed === true,
         win: '> Nickel. L\'IA a fait le changement pour toi, et c\'est exactement ce que tu voulais.',
 
       },
@@ -145,9 +145,9 @@ const LEVELS = [
           'Optimisation du code pour une performance maximale...',
           'C\'est fait ! Le fond est maintenant blanc, admire le résultat !',
         ],
-        aiCode: (code) => code.replace(/background\([^)]*\)/, 'background(255, 255, 255'),
-        
-        check: (s) => s.aiUsed === true,
+        aiCode: getBuggyLevel1(),
+
+        check: (s, code, engine) => engine.aiUsed === true,
         win: "> Ah nan ! On dirait qu'il y a un bug. J'ai l'impression qu'il manque une parenthèse. Tu peux vérifier ça ?",
       },
       {
@@ -158,219 +158,31 @@ const LEVELS = [
           "> Ça devrait aller vite, il suffit de trouver la parenthèse manquante. C\'est un bug facile à repérer",
         ],
         task: 'Trouver et corriger le bug dans le code généré par l\'IA.',
+        aiCode: getBuggyLevel1(),
         bugs: [
           {
             id: 'parenthese',
             hint: 'bug 1 — il manque une parenthèse dans background(255, 255, 255',
-            check: (code) => !code.includes('background(255, 255, 255)'), // check du bug
+            check: (code) => code.includes('background(255, 255, 255)'),
           },
         ],
-        check: (code) => !code.includes('background(255, 255, 255)'), // check de la step
+        check: (s, code) => code.includes('background(255, 255, 255)'),
 
         win: '> Ok on a quelque chose qui marche ! On a compris les bases, passons au niveau suivant.',
       },
     ],
   },
-
-  /* ── Level 2 ─────────────────────────────────────────────── */
-  {
-    id: 2,
-    title: '02 / follow the mouse',
-    win: '> it follows. draw() runs every frame — that\'s why it works.',
-    steps: [
-      {
-        type: 'blocks',
-        toolbox: 'basic',
-        story: [
-          '> first, add the [Every frame] block.',
-        ],
-        task: 'drag [Every frame] into the workspace',
-        check: (s) => s.has('p5_draw'),
-        win: '> good. now use it.',
-      },
-      {
-        type: 'blocks',
-        toolbox: 'basic',
-        story: [
-          '> now put the circle inside [Every frame].',
-          '> use mouseX / mouseY for x and y.',
-          '> ⚠ mouseX only works inside [Every frame], not setup.',
-        ],
-        task: 'circle inside draw() with mouseX and mouseY',
-        check: (s, code) => {
-          const body = code.match(/function draw\s*\(\s*\)\s*\{([\s\S]*)\}/);
-          return body && body[1].includes('mouseX') && body[1].includes('mouseY');
-        },
-        win: '> mouse controls the circle. setup() runs once — draw() runs forever.',
-      },
-    ],
-  },
-
-  /* ── Level 3 ─────────────────────────────────────────────── */
-  {
-    id: 3,
-    title: '03 / ask the AI, then fix it',
-    win: '> all bugs fixed. it works.\n> the AI wrote 80 lines in 2 seconds.\n> you fixed them in 10 minutes.\n> that\'s the deal.',
-    steps: [
-      {
-        type: 'ai-trap',
-        story: [
-          '> okay. next challenge: Conway\'s Game of Life.',
-          '> cells live or die based on their neighbors.',
-          '> 1600 cells. wrapping grid. sounds hard.',
-          '> ...',
-          '> or you could just ask AI.',
-        ],
-        task: 'click [ASK AI] to generate the code automatically',
-        aiTyping: [
-          'analyzing request...',
-          'generating optimal solution...',
-          'adding best practices...',
-          'done! here\'s your Game of Life ✓',
-        ],
-        aiCode: getBuggyGameOfLife(),
-        check: (s) => s.aiUsed === true,
-        win: '> wow, AI wrote 80 lines instantly. surely it works.',
-      },
-      {
-        type: 'debug',
-        aiCode: getBuggyGameOfLife(),
-        story: [
-          '> it does not work.',
-          '> the AI introduced 3 bugs.',
-          '> find and fix them all.',
-        ],
-        task: 'fix 3 bugs — the output pane will show when it\'s working',
-        bugs: [
-          {
-            id: 'typo',
-            hint: 'bug 1 — there\'s a typo in a variable name (line ~14)',
-            check: (code) => !code.includes('widht'),
-          },
-          {
-            id: 'self',
-            hint: 'bug 2 — the neighbor count includes the cell itself',
-            check: (code) => code.includes('if (di===0 && dj===0) continue'),
-          },
-          {
-            id: 'swap',
-            hint: 'bug 3 — the grid never actually updates (look for a commented line)',
-            check: (code) => !code.match(/\/\/.*\[grid.*nextGrid\]|\/\/.*nextGrid.*grid/),
-          },
-        ],
-        check: (s, code) =>
-          !code.includes('widht') &&
-          code.includes('if (di===0 && dj===0) continue') &&
-          !code.match(/\/\/.*\[grid.*nextGrid\]|\/\/.*nextGrid.*grid/),
-        win: '> 3/3. it runs. you understood code that AI got wrong.',
-      },
-    ],
-  },
-
-  /* ── Level 4 ─────────────────────────────────────────────── */
-  {
-    id: 4,
-    title: '04 / lesson learned',
-    win: '',
-    steps: [
-      {
-        type: 'end',
-        story: [
-          '> AI is fast.',
-          '> AI is confident.',
-          '> AI is often wrong.',
-          '> ',
-          '> knowing how to CODE means knowing how to CHECK.',
-          '> that\'s what you just did.',
-          '> ',
-          '> fin.',
-        ],
-        task: '',
-        check: () => true,
-      },
-    ],
-  },
-
 ];
 
-/* ═══════════════════════════════════════════════════════════════
-   Buggy Game of Life — pre-written AI output for level 3→4.
-   Contains exactly 3 bugs, clearly marked with // BUG comments
-   (visible in source, not shown to student in hints).
-   ═══════════════════════════════════════════════════════════════ */
-function getBuggyGameOfLife() {
-  return `// ── Conway's Game of Life ──────────────────────────
-// generated by AI  •  do not modify  •  production ready ✓
-
-let grid, nextGrid, cols, rows;
-const CELL = 12;
-
+function getBuggyLevel1() {
+  return `
 function setup() {
   createCanvas(400, 400);
-  cols = floor(width / CELL);
-  rows = floor(height / CELL);
-
-  // BUG 1: typo — 'widht' instead of 'width' causes ReferenceError
-  let cellSize = widht / cols;
-
-  grid     = makeGrid();
-  nextGrid = makeGrid();
-
-  // seed randomly
-  for (let i = 0; i < cols; i++)
-    for (let j = 0; j < rows; j++)
-      grid[i][j] = random() < 0.3 ? 1 : 0;
-
-  frameRate(12);
+  background(255, 255, 255 ;
 }
-
 function draw() {
-  background(8);
-
-  // draw living cells
-  noStroke();
-  fill(57, 255, 20);
-  for (let i = 0; i < cols; i++)
-    for (let j = 0; j < rows; j++)
-      if (grid[i][j])
-        rect(i * CELL + 1, j * CELL + 1, CELL - 2, CELL - 2);
-
-  // compute next generation
-  for (let i = 0; i < cols; i++) {
-    for (let j = 0; j < rows; j++) {
-      const n = countNeighbors(i, j);
-      if (grid[i][j]) {
-        nextGrid[i][j] = (n === 2 || n === 3) ? 1 : 0;
-      } else {
-        nextGrid[i][j] = (n === 3) ? 1 : 0;
-      }
-    }
-  }
-
-  // BUG 3: swap commented out — grid never advances
-  // [grid, nextGrid] = [nextGrid, grid];
+  fill(0, 0, 255);
+  circle(200, 200, 60);
 }
-
-function countNeighbors(x, y) {
-  let sum = 0;
-  for (let di = -1; di <= 1; di++) {
-    for (let dj = -1; dj <= 1; dj++) {
-      // BUG 2: missing skip for (0,0) — cell counts itself as a neighbor
-      // if (di===0 && dj===0) continue;
-      sum += grid[(x + di + cols) % cols][(y + dj + rows) % rows];
-    }
-  }
-  return sum;
-}
-
-function makeGrid() {
-  return Array.from({ length: cols }, () => new Array(rows).fill(0));
-}
-
-function mousePressed() {
-  const col = floor(mouseX / CELL);
-  const row = floor(mouseY / CELL);
-  if (col >= 0 && col < cols && row >= 0 && row < rows)
-    grid[col][row] = grid[col][row] ? 0 : 1;
-}`;
+`;
 }
