@@ -9,7 +9,7 @@
   --bg3:        #141414;
   --green:      #39ff14;
   --green-hi:   #aaff88;
-  --green-dim:  #1c6b0a;
+  --bone-white:  #f7f0dc;
   --green-mid:  #27a80e;
   --green-glow: #39ff1418;
   --amber:      #ffb300;
@@ -18,7 +18,7 @@
   --border:     #1e3a14;
   --border-hi:  #39ff14;
   --text:       #b8e8a8;
-  --text-dim:   #4a6a40;
+  --text-dim:   #4cf9e5;
   --mono:       'Fira Code', 'Cascadia Code', 'Courier New', monospace;
   --header-h:   34px;
 }
@@ -38,7 +38,7 @@ html, body {
 
 ::-webkit-scrollbar       { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--bg2); }
-::-webkit-scrollbar-thumb { background: var(--green-dim); }
+::-webkit-scrollbar-thumb { background: var(--bone-white); }
 
 .hidden { display: none !important; }
 
@@ -87,8 +87,8 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
   letter-spacing: .04em;
   transition: color .1s, border-color .1s, background .1s;
 }
-.ctrl-btn::before { content: '['; color: var(--green-dim); }
-.ctrl-btn::after  { content: ']'; color: var(--green-dim); }
+.ctrl-btn::before { content: '['; color: var(--bone-white); }
+.ctrl-btn::after  { content: ']'; color: var(--bone-white); }
 .ctrl-btn:hover   { color: var(--green); border-color: var(--green-mid); }
 .ctrl-btn.active  { background: var(--green); color: var(--bg); border-color: var(--green); }
 .ctrl-btn.active::before,
@@ -111,7 +111,7 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
 }
 #progress-fill {
   height: 100%;
-  background: var(--green-dim);
+  background: var(--bone-white);
   transition: width .4s;
 }
 #progress-label { font-size: 10px; color: var(--text-dim); white-space: nowrap; }
@@ -181,6 +181,13 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
+@keyframes narrative-blink {
+  0%   { background: #ffffff; }
+  100% { background: transparent; }
+}
+.narrative-flash {
+  animation: narrative-blink 0.2s ease-out 1;
+}
 .story-line {
   color: var(--text);
   line-height: 1.9;
@@ -189,15 +196,21 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
 }
 #task-text {
   margin-top: 10px;
-  color: var(--text-dim);
   font-size: 10px;
   line-height: 1.7;
   border-top: 1px dashed var(--border);
   padding-top: 8px;
+  color: var(--text-dim);
+  animation: task-pulse 1s ease-in-out infinite;
+}
+
+@keyframes task-pulse {
+  0%, 100% { color: var(--text-dim);  text-shadow: none; }
+  50%       { color: var(--bone-white);    text-shadow: 0 0 8px rgba(57,255,20,0.35); }
 }
 #step-indicator {
   margin-top: 6px;
-  color: var(--green-dim);
+  color: var(--bone-white);
   font-size: 10px;
   letter-spacing: .08em;
 }
@@ -208,10 +221,12 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
   font-size: 11px;
   line-height: 1.8;
   background: var(--green-glow);
-  border: 1px solid var(--green-dim);
+  border: 1px solid var(--bone-white);
   padding: 8px 10px;
 }
-.win-msg::before { content: '> '; color: var(--green-dim); }
+.win-msg::before {color: var(--bone-white); }
+
+
 
 /* Blockly fills remaining height */
 #blockly-section {
@@ -321,7 +336,7 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
   background: var(--bg) !important;
 }
 .CodeMirror-gutters    { background: var(--bg2) !important; border-right: 1px solid var(--border) !important; }
-.CodeMirror-linenumber { color: var(--green-dim) !important; }
+.CodeMirror-linenumber { color: var(--bone-white) !important; }
 .CodeMirror-cursor     { border-left: 2px solid var(--green) !important; }
 .cm-s-dracula.CodeMirror { background: var(--bg) !important; }
 .cm-s-dracula .CodeMirror-gutters { background: var(--bg2) !important; }

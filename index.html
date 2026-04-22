@@ -38,8 +38,10 @@
     </div>
 
     <div id="level-nav">
-      <button id="btn-prev-level" class="ctrl-btn">&lt;</button>
-      <button id="btn-next-level" class="ctrl-btn">&gt;</button>
+      <button id="btn-prev-level" class="ctrl-btn">[&lt;&lt;]</button>
+      <button id="btn-prev-step"  class="ctrl-btn">[&lt;]</button>
+      <button id="btn-next-step"  class="ctrl-btn">[&gt;]</button>
+      <button id="btn-next-level" class="ctrl-btn">[&gt;&gt;]</button>
     </div>
   </header>
 
@@ -88,10 +90,7 @@
     <!-- Pane 2 – Code -->
     <section class="pane" id="pane-code">
       <div class="pane-header">
-        <span class="pane-label">p5.js</span>
-        <div class="pane-actions">
-          <button id="btn-copy-code" class="mini-btn" onclick="navigator.clipboard.writeText(ENGINE.codeEditor.getValue())">copy</button>
-        </div>
+        <span class="pane-label">CODE</span>
       </div>
       <div id="advanced-banner" class="info-banner hidden"></div>
       <div id="error-banner" class="error-banner hidden"></div>

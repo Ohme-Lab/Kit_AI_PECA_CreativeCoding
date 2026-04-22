@@ -165,10 +165,6 @@ function engineLoadStep(step) {
     ENGINE.workspace.updateToolbox(TOOLBOXES[step.toolbox] || TOOLBOXES.basic);
     ENGINE.codeEditor.setOption('readOnly', true);
   } else if (step.type === 'code') {
-
-    //#todo
-    blocksSection.classList.remove('hidden');
-    ENGINE.workspace.updateToolbox(TOOLBOXES.basic);
     ENGINE.codeEditor.setOption('readOnly', false);
 
 
@@ -248,7 +244,19 @@ function engineWin() {
   document.getElementById('btn-next-level').classList.add('active');
 }
 
-/* ── AI injection (step type: ai-trap) ──────────────────────── */
+/* ── Step navigation (prev / next) ─────────────────────────── */
+function engineStepNav(dir) {
+  const lv = ENGINE.level;
+  if (!lv?.steps?.length) return;
+  const next = ENGINE.stepIndex + dir;
+  if (next < 0 || next >= lv.steps.length) return;
+  ENGINE.stepIndex = next;
+  document.getElementById('btn-next-level').classList.remove('active');
+  engineLoadStep(engineCurrentStep());
+  updateStepIndicator();
+}
+
+/* ── AI injection (step type: ai-trap and ask-ai) ──────────────────────── */
 function engineAskAI() {
   const step = engineCurrentStep();
   if (step?.type !== 'ai-trap') return;
@@ -270,9 +278,12 @@ function engineAskAI() {
       log.scrollTop = log.scrollHeight;
     } else {
       clearInterval(tick);
-      ENGINE.codeEditor.setValue(step.aiCode);
+      const injected = typeof step.aiCode === 'function'
+        ? step.aiCode(ENGINE.codeEditor.getValue())
+        : step.aiCode;
+      ENGINE.codeEditor.setValue(injected);
       ENGINE.codeEditor.setOption('readOnly', true);
-      runnerRun(step.aiCode);
+      runnerRun(injected);
       ENGINE.aiUsed = true;
       engineCheck();
     }
@@ -329,12 +340,47 @@ function setBugList(bugs) {
 }
 
 /* ── Narrative ──────────────────────────────────────────────── */
-function setNarrative(lines, task) {
-  const story = document.getElementById('story-text');
-  story.innerHTML = lines.map(l => `<div class="story-line">${l}</div>`).join('');
+let narrativeTimer = null;
 
-  const taskEl = document.getElementById('task-text');
-  taskEl.textContent = task ? '// task: ' + task : '';
+function setNarrative(lines, task) {
+  if (narrativeTimer) clearTimeout(narrativeTimer);
+
+  const story   = document.getElementById('story-text');
+  const taskEl  = document.getElementById('task-text');
+  const section = document.getElementById('story-section');
+
+  // flash blink
+  section.classList.remove('narrative-flash');
+  void section.offsetWidth; // force reflow to restart animation
+  section.classList.add('narrative-flash');
+  setTimeout(() => section.classList.remove('narrative-flash'), 200);
+
+  story.innerHTML  = '';
+  taskEl.textContent = '';
+
+  // build a flat queue: each entry is { el, char }
+  const queue = [];
+  lines.forEach(line => {
+    const div = document.createElement('div');
+    div.className = 'story-line';
+    story.appendChild(div);
+    for (const ch of line) queue.push({ el: div, ch });
+    queue.push(null); // line separator (no-op tick)
+  });
+  if (task) {
+    const full = '// task: ' + task;
+    for (const ch of full) queue.push({ el: taskEl, ch });
+  }
+
+  let i = 0;
+  const SPEED = 9; // ms per char
+  function tick() {
+    if (i >= queue.length) return;
+    const entry = queue[i++];
+    if (entry) entry.el.textContent += entry.ch;
+    narrativeTimer = setTimeout(tick, SPEED);
+  }
+  tick();
 }
 
 /* ── Win message ────────────────────────────────────────────── */

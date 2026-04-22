@@ -103,6 +103,8 @@ function initControls() {
   $('btn-next-level').onclick = () => {
     if (ENGINE.levelIndex < LEVELS.length - 1) engineLoad(ENGINE.levelIndex + 1);
   };
+  $('btn-prev-step').onclick = () => engineStepNav(-1);
+  $('btn-next-step').onclick = () => engineStepNav(+1);
 }
 
 function setActive(id) {

@@ -118,42 +118,56 @@ const LEVELS = [
         story: [
             '> Tu peux aussi demander à l’IA de modifier un programme très simple. Ici, on lui demande un petit changement facile à vérifier.',
         ],
-        task: 'Demander à l\'IA de changer la couleur du cercle en rouge.',
+        task: 'Demander à l\'IA de changer la couleur du cercle en bleu.',
+
         aiTyping: [
           'analyzing request...',
           'generating optimal solution...',
           'adding best practices...',
-          'blip bloup ! J\'ai changé le code pour que le cercle soit rouge. C\'est fait !',
+          'blip bloup ! J\'ai changé le code pour que le cercle soit bleu. C\'est fait !',
         ],
-        aiCode: `function setup() {
-                    createCanvas(400, 400);
-                  }
-
-                  function draw() {
-                    background(10, 10, 10);
-                    fill(255, 0, 0);
-                    circle(width/2, height/2, 100);
-                  }`,
+        aiCode: (code) => code.replace(/fill\([^)]*\)/, 'fill(0, 0, 255)'),
 
         check: (s) => s.aiUsed === true,
-        win: '> wow, AI wrote 80 lines instantly. surely it works.',
+        win: '> Nickel. L\'IA a fait le changement pour toi, et c\'est exactement ce que tu voulais.',
 
       },
       {
+        //step 8: ask ai with a buggy request
         type: 'ai-trap',
         story: [
-          '> okay. next challenge: Conway\'s Game of Life.',
+          '> okay. On va essayer autre chose, demande à la machine de changer le fond en blanc !',
         ],
         task: 'click [ASK AI] to generate the code automatically',
         aiTyping: [
-          'analyzing request...',
-          'generating optimal solution...',
-          'adding best practices...',
-          'done! here\'s your Game of Life ✓',
+          'Réflexion hyper intense en cours...',
+          'Génération des meilleures lignes de code pour ce changement...',
+          'Optimisation du code pour une performance maximale...',
+          'C\'est fait ! Le fond est maintenant blanc, admire le résultat !',
         ],
-        aiCode: getBuggyGameOfLife(),
+        aiCode: (code) => code.replace(/background\([^)]*\)/, 'background(255, 255, 255'),
+        
         check: (s) => s.aiUsed === true,
-        win: '> wow, AI wrote 80 lines instantly. surely it works.',
+        win: "> Ah nan ! On dirait qu'il y a un bug. J'ai l'impression qu'il manque une parenthèse. Tu peux vérifier ça ?",
+      },
+      {
+        //step 9: debug ai code
+        type: 'debug',
+        story: [
+          "> Bon, le changement est là, mais il y a un bug dans le code que l\'IA a généré.",
+          "> Ça devrait aller vite, il suffit de trouver la parenthèse manquante. C\'est un bug facile à repérer",
+        ],
+        task: 'Trouver et corriger le bug dans le code généré par l\'IA.',
+        bugs: [
+          {
+            id: 'parenthese',
+            hint: 'bug 1 — il manque une parenthèse dans background(255, 255, 255',
+            check: (code) => !code.includes('background(255, 255, 255)'), // check du bug
+          },
+        ],
+        check: (code) => !code.includes('background(255, 255, 255)'), // check de la step
+
+        win: '> Ok on a quelque chose qui marche ! On a compris les bases, passons au niveau suivant.',
       },
     ],
   },
