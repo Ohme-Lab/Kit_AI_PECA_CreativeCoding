@@ -75,8 +75,6 @@ html, body {
   font-weight: 700;
 }
 
-#playback-controls { gap: 4px; }
-
 button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size: 11px; }
 
 .ctrl-btn {
@@ -94,9 +92,6 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
 .ctrl-btn.active::before,
 .ctrl-btn.active::after { color: var(--bg); }
 
-#speed-wrap { gap: 5px; color: var(--text-dim); font-size: 11px; }
-#speed-slider { width: 60px; accent-color: var(--green); cursor: pointer; }
-#speed-label  { min-width: 44px; color: var(--green-mid); }
 
 /* progress bar in header */
 #header-progress {
@@ -128,15 +123,22 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
 .pane {
   display: flex;
   flex-direction: column;
-  border-right: 1px solid var(--border);
   overflow: hidden;
   flex-shrink: 0;
 }
-.pane:last-child { border-right: none; }
 
-#pane-left   { width: 28%; min-width: 220px; }
-#pane-code   { width: 38%; min-width: 240px; }
-#pane-visual { flex: 1; min-width: 200px; }
+#pane-left   { width: 28%; min-width: 180px; }
+#pane-code   { width: 38%; min-width: 180px; }
+#pane-visual { flex: 1;    min-width: 160px; }
+
+.pane-resizer {
+  width: 5px;
+  flex-shrink: 0;
+  background: var(--border);
+  cursor: col-resize;
+  transition: background .15s;
+}
+.pane-resizer:hover, .pane-resizer.dragging { background: var(--green); }
 
 .pane-header {
   display: flex;
@@ -180,6 +182,7 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
   padding: 14px 12px 10px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  min-height: 25%;
 }
 @keyframes narrative-blink {
   0%   { background: #ffffff; }

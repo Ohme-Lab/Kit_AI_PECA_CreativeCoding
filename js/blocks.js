@@ -24,11 +24,11 @@ Blockly.Blocks['p5_setup'] = {
 
 Blockly.Blocks['p5_create_canvas'] = {
   init() {
-    this.appendValueInput('W').setCheck('Number').appendField('🖼 Créer un canvas. largeur ');
+    this.appendValueInput('W').setCheck('Number').appendField('🖼 Créer un canevas. Largeur : ');
     this.appendValueInput('H').setCheck('Number').appendField('hauteur');
     this.setInputsInline(true);
     this.setColour('#4C97FF');
-    this.setTooltip('Creates the drawing canvas. Put this inside setup(). 400×400 is a good start.');
+    this.setTooltip("Crée le canevas où tout se passe. Placez ce bloc dans setup() pour qu'il s'exécute une fois au début.");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
   }
@@ -41,7 +41,7 @@ Blockly.Blocks['p5_draw'] = {
     this.appendStatementInput('BODY')
         .setCheck(null);
     this.setColour('#4C97FF');
-    this.setTooltip('Runs ~30 times per second — like the pages of a flipbook. Draw and update everything here!');
+    this.setTooltip('S\'exécute ~30 fois par seconde — comme les pages d\'un livre d\'animation. Dessinez et mettez à jour tout ici!');
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
   }
@@ -52,7 +52,7 @@ Blockly.Blocks['p5_background'] = {
   init() {
     this.appendValueInput('COLOR')
         .setCheck('Colour')
-        .appendField('🎨 Couleur du background');
+        .appendField('background  🎨');
     this.setInputsInline(true);
     this.setColour('#FF8C42');
     this.setTooltip('Change la couleur du fond du canevas. Placez ce bloc au début de draw() pour qu\'il s\'applique à chaque frame, ou dans setup() pour qu\'il s\'applique une fois au début.');
@@ -65,10 +65,10 @@ Blockly.Blocks['p5_fill'] = {
   init() {
     this.appendValueInput('COLOR')
         .setCheck('Colour')
-        .appendField('🖌  Fill shapes with');
+        .appendField('remplir les formes avec');
     this.setInputsInline(true);
     this.setColour('#FF8C42');
-    this.setTooltip('Sets the fill color for all shapes drawn after this block.');
+    this.setTooltip("Remplis les formes avec une couleur. Placez ce bloc avant les blocs de dessin pour qu'il s'applique à ceux-ci et tous les blocs suivants, jusqu'à ce que vous changiez la couleur à nouveau.");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
   }
@@ -78,10 +78,10 @@ Blockly.Blocks['p5_stroke'] = {
   init() {
     this.appendValueInput('COLOR')
         .setCheck('Colour')
-        .appendField('✏️  Outline shapes with');
+        .appendField('dessiner les contours avec ');
     this.setInputsInline(true);
     this.setColour('#FF8C42');
-    this.setTooltip('Sets the outline (stroke) color for shapes.');
+    this.setTooltip('Dessine les contours des formes avec une couleur. Placez ce bloc avant les blocs de dessin pour qu\'il s\'applique à ceux-ci et tous les blocs suivants, jusqu\'à ce que vous changiez la couleur à nouveau.');
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
   }
@@ -89,9 +89,9 @@ Blockly.Blocks['p5_stroke'] = {
 
 Blockly.Blocks['p5_no_stroke'] = {
   init() {
-    this.appendDummyInput().appendField('🚫  Remove shape outlines');
+    this.appendDummyInput().appendField('Pas de contours');
     this.setColour('#FF8C42');
-    this.setTooltip('Draws shapes without an outline — looks cleaner for grids!');
+    this.setTooltip('Dessine les formes sans contours — juste le remplissage.');
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
   }
@@ -99,9 +99,9 @@ Blockly.Blocks['p5_no_stroke'] = {
 
 Blockly.Blocks['p5_no_fill'] = {
   init() {
-    this.appendDummyInput().appendField('🚫  Make shapes transparent');
+    this.appendDummyInput().appendField('Pas de remplissage');
     this.setColour('#FF8C42');
-    this.setTooltip('Draws shapes with no fill — just the outline remains.');
+    this.setTooltip('Dessine les formes sans remplissage — juste les contours restent.');
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
   }
@@ -109,13 +109,13 @@ Blockly.Blocks['p5_no_fill'] = {
 
 Blockly.Blocks['p5_circle'] = {
   init() {
-    this.appendDummyInput().appendField('⭕  Draw circle');
+    this.appendDummyInput().appendField('Dessinner un cercle');
     this.appendValueInput('X').setCheck('Number').appendField('x');
     this.appendValueInput('Y').setCheck('Number').appendField('y');
     this.appendValueInput('SIZE').setCheck('Number').appendField('size');
     this.setInputsInline(true);
     this.setColour('#FF6B6B');
-    this.setTooltip('Draw a circle at position (x, y) with the given diameter.');
+    this.setTooltip('Dessine un cercle à la position (x, y) avec le diamètre donné.');
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
   }
@@ -123,28 +123,14 @@ Blockly.Blocks['p5_circle'] = {
 
 Blockly.Blocks['p5_rect'] = {
   init() {
-    this.appendDummyInput().appendField('▭  Draw rectangle');
+    this.appendDummyInput().appendField('Dessiner un rectangle');
     this.appendValueInput('X').setCheck('Number').appendField('x');
     this.appendValueInput('Y').setCheck('Number').appendField('y');
     this.appendValueInput('W').setCheck('Number').appendField('width');
     this.appendValueInput('H').setCheck('Number').appendField('height');
     this.setInputsInline(true);
     this.setColour('#FF6B6B');
-    this.setTooltip('Draw a rectangle at (x, y) with the given width and height.');
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-  }
-};
-
-Blockly.Blocks['p5_framerate'] = {
-  init() {
-    this.appendValueInput('RATE')
-        .setCheck('Number')
-        .appendField('⏱  Set speed to');
-    this.appendDummyInput().appendField('frames/sec');
-    this.setInputsInline(true);
-    this.setColour('#4C97FF');
-    this.setTooltip('Controls how fast the animation runs. Try 10 for Game of Life — slow enough to watch!');
+    this.setTooltip('Dessine un rectangle à la position (x, y) avec la largeur et la hauteur données.');
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
   }
@@ -179,166 +165,13 @@ Blockly.Blocks['p5_random'] = {
   }
 };
 
-// ── PHASE 2 ───────────────────────────────────────────────────
-
-// ── Grid ─────────────────────────────────────────────────────
-Blockly.Blocks['p5_grid_create'] = {
+Blockly.Blocks['p5_mouse_if'] = {
   init() {
-    this.appendDummyInput()
-        .appendField('🔲  Create grid');
-    this.appendValueInput('COLS')
-        .setCheck('Number')
-        .appendField('columns');
-    this.appendValueInput('ROWS')
-        .setCheck('Number')
-        .appendField('rows');
-    this.appendValueInput('COLOR')
-        .setCheck('Colour')
-        .appendField('cell color');
-    this.setColour('#00C853');
-    this.setTooltip(
-      'Sets up a grid of cells — the "world" where Game of Life happens. ' +
-      '40×40 is a good start. Each cell can be alive (1) or dead (0). ' +
-      'The grid wraps around at the edges!'
-    );
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-  }
-};
-
-Blockly.Blocks['p5_grid_show'] = {
-  init() {
-    this.appendDummyInput()
-        .appendField('🖼  Show living cells');
-    this.setColour('#00C853');
-    this.setTooltip(
-      'Draws every cell that is currently alive. ' +
-      'Place this inside Every Frame so the grid is redrawn each tick!'
-    );
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-  }
-};
-
-Blockly.Blocks['p5_grid_seed'] = {
-  init() {
-    this.appendValueInput('DENSITY')
-        .setCheck('Number')
-        .appendField('🌱  Randomly seed');
-    this.appendDummyInput()
-        .appendField('% of cells alive');
-    this.setInputsInline(true);
-    this.setColour('#00C853');
-    this.setTooltip(
-      'Randomly turns on a percentage of cells. Try 30%! ' +
-      'Put this in When Sketch Starts so the grid is seeded once at the beginning.'
-    );
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-  }
-};
-
-// ── Life Rules ───────────────────────────────────────────────
-Blockly.Blocks['p5_life_rules'] = {
-  init() {
-    this.appendDummyInput()
-        .appendField('🧬  Apply Conway\'s rules');
-    this.setColour('#00BCD4');
-    this.setTooltip(
-      'The heart of Game of Life! Applies these rules to every cell:\n' +
-      '• A living cell with 2 or 3 neighbors SURVIVES\n' +
-      '• A living cell with < 2 or > 3 neighbors DIES\n' +
-      '• A dead cell with exactly 3 neighbors becomes ALIVE\n\n' +
-      'Put this at the end of Every Frame!'
-    );
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-  }
-};
-
-Blockly.Blocks['p5_neighbors'] = {
-  init() {
-    this.appendValueInput('X').setCheck('Number').appendField('👥 neighbors of cell  col');
-    this.appendValueInput('Y').setCheck('Number').appendField('row');
-    this.setInputsInline(true);
-    this.setColour('#00BCD4');
-    this.setOutput(true, 'Number');
-    this.setTooltip(
-      'Returns how many of the 8 surrounding cells are currently alive. ' +
-      'This is the number Conway\'s rules are based on!'
-    );
-  }
-};
-
-Blockly.Blocks['p5_cell_alive'] = {
-  init() {
-    this.appendValueInput('X').setCheck('Number').appendField('❓ is cell  col');
-    this.appendValueInput('Y').setCheck('Number').appendField('row');
-    this.appendDummyInput().appendField('alive?');
-    this.setInputsInline(true);
-    this.setColour('#00BCD4');
-    this.setOutput(true, 'Boolean');
-    this.setTooltip('Returns true if the cell at (col, row) is currently alive.');
-  }
-};
-
-Blockly.Blocks['p5_set_cell'] = {
-  init() {
-    this.appendValueInput('X').setCheck('Number').appendField('⚡ Set cell  col');
-    this.appendValueInput('Y').setCheck('Number').appendField('row  →');
-    this.appendDummyInput()
-        .appendField(new Blockly.FieldDropdown([
-          ['alive', '1'],
-          ['dead',  '0'],
-        ]), 'STATE');
-    this.setInputsInline(true);
-    this.setColour('#00BCD4');
-    this.setTooltip('Manually set a cell to alive (1) or dead (0). Useful for custom patterns!');
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-  }
-};
-
-Blockly.Blocks['p5_custom_rule'] = {
-  init() {
-    this.appendDummyInput().appendField('📏  Custom rule: if living cell has');
-    this.appendValueInput('N').setCheck('Number');
-    this.appendDummyInput()
-        .appendField(new Blockly.FieldDropdown([
-          ['exactly',       '==='],
-          ['fewer than',    '<'],
-          ['more than',     '>'],
-          ['at least',      '>='],
-          ['at most',       '<='],
-        ]), 'OP')
-        .appendField('neighbors →');
-    this.appendDummyInput()
-        .appendField(new Blockly.FieldDropdown([
-          ['it SURVIVES', 'survive'],
-          ['it DIES',     'die'],
-        ]), 'RESULT');
-    this.setColour('#00BCD4');
-    this.setTooltip(
-      'Add a custom survival rule! Conway\'s classic rules are: survive with 2 or 3 neighbors. ' +
-      'What happens if you change them?'
-    );
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-  }
-};
-
-// ── PHASE 3 ───────────────────────────────────────────────────
-Blockly.Blocks['p5_ai_magic'] = {
-  init() {
-    this.appendDummyInput()
-        .appendField('✨  AI Magic');
-    this.appendDummyInput()
-        .appendField('generates a creative twist on your sketch');
+    this.appendDummyInput().appendField('🖱 si clic de souris');
+    this.appendStatementInput('DO').appendField('alors');
+    this.appendStatementInput('ELSE').appendField('sinon');
     this.setColour('#E040FB');
-    this.setTooltip(
-      'Sends your current sketch to an AI and asks it to add a creative visual effect. ' +
-      'What will it come up with?'
-    );
+    this.setTooltip('Exécute les blocs "alors" quand la souris est cliquée, "sinon" autrement.');
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
   }

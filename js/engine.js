@@ -100,6 +100,53 @@ const TOOLBOXES = {
       },
     ]
   },
+
+  level_2: {
+    kind: 'categoryToolbox',
+    contents: [
+      {
+        kind: 'category', name: '⚙ Setup', colour: '#1a7a0a',
+        contents: [
+          { kind: 'block', type: 'p5_setup' },
+          { kind: 'block', type: 'p5_create_canvas',
+            inputs: {
+              W: { shadow: { type: 'math_number', fields: { NUM: 400 } } },
+              H: { shadow: { type: 'math_number', fields: { NUM: 400 } } },
+            }},
+          { kind: 'block', type: 'p5_draw' },
+        ]
+      },
+      {
+        kind: 'category', name: '✏ formes', colour: '#2a5a0a',
+        contents: [
+          { kind: 'block', type: 'p5_circle',
+            inputs: {
+              X:    { shadow: { type: 'math_number', fields: { NUM: 200 } } },
+              Y:    { shadow: { type: 'math_number', fields: { NUM: 200 } } },
+              SIZE: { shadow: { type: 'math_number', fields: { NUM: 60  } } },
+            }},
+        ]
+      },
+      {
+        kind: 'category', name: '🖱 interaction', colour: '#E040FB',
+        contents: [
+          { kind: 'block', type: 'p5_mouse_if' },
+          { kind: 'block', type: 'p5_mousex' },
+          { kind: 'block', type: 'p5_mousey' },
+        ]
+      },
+      {
+        kind: 'category', name: '🖌 couleurs', colour: '#3a6a0a',
+        contents: [
+          { kind: 'block', type: 'p5_background',
+            inputs: { COLOR: { shadow: { type: 'colour_picker', fields: { COLOUR: '#0a0a0a' } } } }},
+          { kind: 'block', type: 'p5_fill',
+            inputs: { COLOR: { shadow: { type: 'colour_picker', fields: { COLOUR: '#39ff14' } } } }},
+          { kind: 'block', type: 'p5_no_stroke' },
+        ]
+      },
+    ]
+  },
 };
 
 /* ── Engine state ───────────────────────────────────────────── */
