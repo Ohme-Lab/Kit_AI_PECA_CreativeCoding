@@ -2,10 +2,12 @@
    LEVELS — the content file.
    Add new levels here. The engine reads this array in order.
 
-   Level types:
-     'blocks'   — student drags blocks to satisfy check()
-     'ai-trap'  — narrative + big [ASK AI] button; AI injects aiCode
-     'debug'    — student edits code to fix bugs; each bug has a check()
+   Each level has: id, title, win, steps[]
+   Each step has:  type, story[], task, check(), and type-specific fields:
+     type 'blocks'  → toolbox
+     type 'ai-trap' → aiTyping[], aiCode
+     type 'debug'   → aiCode, bugs[]
+     type 'end'     → (no extras)
 
    ═══════════════════════════════════════════════════════════════ */
 
@@ -14,150 +16,265 @@ const LEVELS = [
   /* ── Level 1 ─────────────────────────────────────────────── */
   {
     id: 1,
-    type: 'blocks',
     title: '01 / Bonjour, un canvas s\'il vous plait',
+    steps: [
+      {
+        //step 1: create canvas (setup() and draw() functions already on place)
+        type: 'blocks',
+        toolbox: 'level_1',
+        story: [
+          '> Tout commence par un espace de dessin.',
+          '> Avant de créer des formes, il faut créer le monde où elles apparaîtront.',
+        ],
+        task: 'Créer un canvas.',
 
-    story: [
-      '> Tout commence par un espace de dessin.',
-      '> Avant de créer des formes, il faut créer le monde où elles apparaîtront.',
+        check: (s, code) =>
+          /function setup\s*\(\s*\)\s*\{[\s\S]*\}/.test(code) &&
+          /function draw\s*\(\s*\)\s*\{[\s\S]*\}/.test(code),
+
+        win: '> Parfait. Ton monde existe maintenant.',
+        initialBlocks: {
+          blocks: {
+            languageVersion: 0,
+            blocks: [
+              {type: 'p5_setup', x: 20, y: 20,
+                next: {block : {type: 'p5_draw', x: 20, y: 100,}}
+              },
+            ],
+          },
+        },
+      },
+      {
+        //step 2: add a circle in draw()
+        type: 'blocks',
+        toolbox: 'level_1',
+        story: [
+          '> Une seule forme peut déjà devenir un programme. On commence par afficher un rond simple.',
+        ],
+        task: 'Faire apparaître un rond au centre du canevas.',
+
+        check: (s, code) => {                        
+            const draw = code.match(/function draw\s*\(\s*\)\s*\{([\s\S]*?)\}/);                                                          
+            return draw && draw[1].includes('circle(');                                                                                                                                                                                     
+          },   
+        win: '> Bien. Une première forme apparaît.',
+      },
+     {
+        //step 3: add background
+        type: 'blocks',
+        toolbox: 'level_1',
+        story: [
+          '> Préparons le monde pour nos formes. Un fond sombre fera mieux ressortir les couleurs vives de nos cercles.',
+          '> Place le block background dans [setup] pour qu\'il s\'applique une fois au début.',
+        ],
+        task: 'Utiliser le bloc [Background].',
+        
+
+        check: (s, code) => /background\(/.test(code), 
+        win: '> Parfait. Plus qu\'à changer la couleur.',
+      },
+     {
+        //step 4: add background color
+        type: 'blocks',
+        toolbox: 'level_1',
+        story: [
+          '> Changeons la couleur du fond, le noir est un peu triste.',
+        ],
+        task: 'Changer la couleur du background (🎨).',
+
+        check: (s, code) => /background\(/.test(code) && !code.includes('10, 10, 10'),
+        win: '> Parfait. Le canevas est maintenant bien visible.',
+      },
+      {
+        //step 5: change fill color
+        type: 'blocks',
+        toolbox: 'level_1',
+        story: [
+          '> Une même forme peut avoir plusieurs apparences. Une petite modification peut changer toute l’ambiance.',
+          '> Essayons une autre couleur pour le cercle',
+        ],
+        task: 'Changer la couleur du cercle',
+
+        check: (s, code) =>                                                                                                                                           
+          /fill\(/.test(code) && !code.includes('57, 255, 20'),
+        win: '> Oui. Même forme, nouvelle couleur.',
+      },
+      {
+        //step 6: fill color via code instead of blocks
+        type: 'code',
+        toolbox: 'level_1',
+        story: [
+            '> Les blocs et le code racontent la même chose de deux façons différentes. Cette fois, la modification se fait dans le code.',
+            '> Changeons la couleur du cercle en modifiant le code de draw(), comment avoir du rouge ?',
+        ],
+        task: 'Changer la couleur du cercle',
+
+        check: (s, code) => /fill\(/.test(code) && code.includes('255, 0, 0'),
+        win: '> Très bien. Tu changes maintenant directement le code.',
+      },
+      {
+        //step 7: ask ai
+        type: 'ai-trap',
+        story: [
+            '> Tu peux aussi demander à l’IA de modifier un programme très simple. Ici, on lui demande un petit changement facile à vérifier.',
+        ],
+        task: 'Demander à l\'IA de changer la couleur du cercle en rouge.',
+        aiTyping: [
+          'analyzing request...',
+          'generating optimal solution...',
+          'adding best practices...',
+          'blip bloup ! J\'ai changé le code pour que le cercle soit rouge. C\'est fait !',
+        ],
+        aiCode: `function setup() {
+                    createCanvas(400, 400);
+                  }
+
+                  function draw() {
+                    background(10, 10, 10);
+                    fill(255, 0, 0);
+                    circle(width/2, height/2, 100);
+                  }`,
+
+        check: (s) => s.aiUsed === true,
+        win: '> wow, AI wrote 80 lines instantly. surely it works.',
+
+      },
+      {
+        type: 'ai-trap',
+        story: [
+          '> okay. next challenge: Conway\'s Game of Life.',
+        ],
+        task: 'click [ASK AI] to generate the code automatically',
+        aiTyping: [
+          'analyzing request...',
+          'generating optimal solution...',
+          'adding best practices...',
+          'done! here\'s your Game of Life ✓',
+        ],
+        aiCode: getBuggyGameOfLife(),
+        check: (s) => s.aiUsed === true,
+        win: '> wow, AI wrote 80 lines instantly. surely it works.',
+      },
     ],
-
-    task: 'Créer un canevas.',
-
-    // which toolbox categories to expose (see engine.js TOOLBOXES)
-    toolbox: 'level_1',
-
-    check: (s) => s.has('p5_setup') && s.has('p5_circle'),
-    win: '> nice. one circle. that\'s a whole program.',
   },
 
   /* ── Level 2 ─────────────────────────────────────────────── */
   {
     id: 2,
-    type: 'blocks',
     title: '02 / follow the mouse',
-
-    story: [
-      '> now make the circle follow the mouse.',
-      '> ',
-      '> ⚠ mouseX only works inside [Every frame].',
-      '> setup() runs once — draw() runs forever.',
-      '> put the circle inside [Every frame], not setup.',
-    ],
-
-    task: 'drag [Every frame], put circle inside it, use mouseX / mouseY for x and y',
-
-    toolbox: 'basic',
-
-    // mouseX and mouseY must appear inside the draw() body
-    check: (s, code) => {
-      const drawBody = code.match(/function draw\s*\(\s*\)\s*\{([\s\S]*)\}/);
-      return drawBody && drawBody[1].includes('mouseX') && drawBody[1].includes('mouseY');
-    },
-
     win: '> it follows. draw() runs every frame — that\'s why it works.',
+    steps: [
+      {
+        type: 'blocks',
+        toolbox: 'basic',
+        story: [
+          '> first, add the [Every frame] block.',
+        ],
+        task: 'drag [Every frame] into the workspace',
+        check: (s) => s.has('p5_draw'),
+        win: '> good. now use it.',
+      },
+      {
+        type: 'blocks',
+        toolbox: 'basic',
+        story: [
+          '> now put the circle inside [Every frame].',
+          '> use mouseX / mouseY for x and y.',
+          '> ⚠ mouseX only works inside [Every frame], not setup.',
+        ],
+        task: 'circle inside draw() with mouseX and mouseY',
+        check: (s, code) => {
+          const body = code.match(/function draw\s*\(\s*\)\s*\{([\s\S]*)\}/);
+          return body && body[1].includes('mouseX') && body[1].includes('mouseY');
+        },
+        win: '> mouse controls the circle. setup() runs once — draw() runs forever.',
+      },
+    ],
   },
 
   /* ── Level 3 ─────────────────────────────────────────────── */
   {
     id: 3,
-    type: 'ai-trap',
-    title: '03 / ask the AI',
-
-    story: [
-      '> okay. next challenge: Conway\'s Game of Life.',
-      '> cells live or die based on their neighbors.',
-      '> 1600 cells. wrapping grid. sounds hard.',
-      '> ...',
-      '> or you could just ask AI.',
+    title: '03 / ask the AI, then fix it',
+    win: '> all bugs fixed. it works.\n> the AI wrote 80 lines in 2 seconds.\n> you fixed them in 10 minutes.\n> that\'s the deal.',
+    steps: [
+      {
+        type: 'ai-trap',
+        story: [
+          '> okay. next challenge: Conway\'s Game of Life.',
+          '> cells live or die based on their neighbors.',
+          '> 1600 cells. wrapping grid. sounds hard.',
+          '> ...',
+          '> or you could just ask AI.',
+        ],
+        task: 'click [ASK AI] to generate the code automatically',
+        aiTyping: [
+          'analyzing request...',
+          'generating optimal solution...',
+          'adding best practices...',
+          'done! here\'s your Game of Life ✓',
+        ],
+        aiCode: getBuggyGameOfLife(),
+        check: (s) => s.aiUsed === true,
+        win: '> wow, AI wrote 80 lines instantly. surely it works.',
+      },
+      {
+        type: 'debug',
+        aiCode: getBuggyGameOfLife(),
+        story: [
+          '> it does not work.',
+          '> the AI introduced 3 bugs.',
+          '> find and fix them all.',
+        ],
+        task: 'fix 3 bugs — the output pane will show when it\'s working',
+        bugs: [
+          {
+            id: 'typo',
+            hint: 'bug 1 — there\'s a typo in a variable name (line ~14)',
+            check: (code) => !code.includes('widht'),
+          },
+          {
+            id: 'self',
+            hint: 'bug 2 — the neighbor count includes the cell itself',
+            check: (code) => code.includes('if (di===0 && dj===0) continue'),
+          },
+          {
+            id: 'swap',
+            hint: 'bug 3 — the grid never actually updates (look for a commented line)',
+            check: (code) => !code.match(/\/\/.*\[grid.*nextGrid\]|\/\/.*nextGrid.*grid/),
+          },
+        ],
+        check: (s, code) =>
+          !code.includes('widht') &&
+          code.includes('if (di===0 && dj===0) continue') &&
+          !code.match(/\/\/.*\[grid.*nextGrid\]|\/\/.*nextGrid.*grid/),
+        win: '> 3/3. it runs. you understood code that AI got wrong.',
+      },
     ],
-
-    task: 'click [ASK AI] to generate the code automatically',
-
-    // Fake "AI typing" messages shown while code is injected
-    aiTyping: [
-      'analyzing request...',
-      'generating optimal solution...',
-      'adding best practices...',
-      'done! here\'s your Game of Life ✓',
-    ],
-
-    // Pre-written code with 3 intentional bugs (see debug level below)
-    // Students won't edit here — this flows straight into level 4
-    aiCode: getBuggyGameOfLife(),
-
-    check: (s) => s.aiUsed === true,
-
-    win: '> wow, AI wrote 80 lines instantly. surely it works.',
   },
 
   /* ── Level 4 ─────────────────────────────────────────────── */
   {
     id: 4,
-    type: 'debug',
-    title: '04 / fix the AI',
-
-    story: [
-      '> it does not work.',
-      '> the AI introduced 3 bugs.',
-      '> find and fix them all.',
-    ],
-
-    task: 'fix 3 bugs — the output pane will show when it\'s working',
-
-    // Each bug: a hint shown to the student + a check against the code string
-    bugs: [
-      {
-        id: 'typo',
-        hint: 'bug 1 — there\'s a typo in a variable name (line ~14)',
-        // Bug: `widht` instead of `width`
-        check: (code) => !code.includes('widht'),
-        fixedMsg: '✓ typo fixed',
-      },
-      {
-        id: 'self',
-        hint: 'bug 2 — the neighbor count includes the cell itself',
-        // Bug: missing `if (di===0 && dj===0) continue;`
-        check: (code) => code.includes('if (di===0 && dj===0) continue'),
-        fixedMsg: '✓ neighbor count fixed',
-      },
-      {
-        id: 'swap',
-        hint: 'bug 3 — the grid never actually updates (look for a commented line)',
-        // Bug: swap line is commented out
-        check: (code) => !code.match(/\/\/.*\[grid.*nextGrid\]|\/\/.*nextGrid.*grid/),
-        fixedMsg: '✓ grid swap fixed',
-      },
-    ],
-
-    check: (s, code) =>
-      !code.includes('widht') &&
-      code.includes('if (di===0 && dj===0) continue') &&
-      !code.match(/\/\/.*\[grid.*nextGrid\]|\/\/.*nextGrid.*grid/),
-
-    win: '> all bugs fixed. it works.\n> the AI wrote 80 lines in 2 seconds.\n> you fixed them in 10 minutes.\n> that\'s the deal.',
-  },
-
-  /* ── Level 5 ─────────────────────────────────────────────── */
-  {
-    id: 5,
-    type: 'end',
-    title: '05 / lesson learned',
-
-    story: [
-      '> AI is fast.',
-      '> AI is confident.',
-      '> AI is often wrong.',
-      '> ',
-      '> knowing how to CODE means knowing how to CHECK.',
-      '> that\'s what you just did.',
-      '> ',
-      '> fin.',
-    ],
-
-    task: '',
-    check: () => true,
+    title: '04 / lesson learned',
     win: '',
+    steps: [
+      {
+        type: 'end',
+        story: [
+          '> AI is fast.',
+          '> AI is confident.',
+          '> AI is often wrong.',
+          '> ',
+          '> knowing how to CODE means knowing how to CHECK.',
+          '> that\'s what you just did.',
+          '> ',
+          '> fin.',
+        ],
+        task: '',
+        check: () => true,
+      },
+    ],
   },
 
 ];

@@ -12,7 +12,7 @@
 Blockly.Blocks['p5_setup'] = {
   init() {
     this.appendDummyInput()
-        .appendField('⚙️  Départ du sketch');
+        .appendField('setup');
     this.appendStatementInput('BODY')
         .setCheck(null);
     this.setColour('#4C97FF');
@@ -22,10 +22,22 @@ Blockly.Blocks['p5_setup'] = {
   }
 };
 
+Blockly.Blocks['p5_create_canvas'] = {
+  init() {
+    this.appendValueInput('W').setCheck('Number').appendField('🖼 Créer un canvas. largeur ');
+    this.appendValueInput('H').setCheck('Number').appendField('hauteur');
+    this.setInputsInline(true);
+    this.setColour('#4C97FF');
+    this.setTooltip('Creates the drawing canvas. Put this inside setup(). 400×400 is a good start.');
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+  }
+};
+
 Blockly.Blocks['p5_draw'] = {
   init() {
     this.appendDummyInput()
-        .appendField('🔁  Every frame');
+        .appendField('draw');
     this.appendStatementInput('BODY')
         .setCheck(null);
     this.setColour('#4C97FF');
@@ -40,10 +52,10 @@ Blockly.Blocks['p5_background'] = {
   init() {
     this.appendValueInput('COLOR')
         .setCheck('Colour')
-        .appendField('🎨  Clear screen to');
+        .appendField('🎨 Couleur du background');
     this.setInputsInline(true);
     this.setColour('#FF8C42');
-    this.setTooltip('Wipes the canvas with this color. Put it at the top of Every Frame so each frame starts fresh!');
+    this.setTooltip('Change la couleur du fond du canevas. Placez ce bloc au début de draw() pour qu\'il s\'applique à chaque frame, ou dans setup() pour qu\'il s\'applique une fois au début.');
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
   }

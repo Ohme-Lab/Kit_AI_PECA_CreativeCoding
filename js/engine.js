@@ -12,6 +12,12 @@ const TOOLBOXES = {
         kind: 'category', name: '⚙ Setup', colour: '#1a7a0a',
         contents: [
           { kind: 'block', type: 'p5_setup' },
+          { kind: 'block', type: 'p5_create_canvas',
+            inputs: {
+              W: { shadow: { type: 'math_number', fields: { NUM: 400 } } },
+              H: { shadow: { type: 'math_number', fields: { NUM: 400 } } },
+            }},
+          { kind: 'block', type: 'p5_draw'  },
         ]
       },
       {
@@ -30,20 +36,6 @@ const TOOLBOXES = {
             }},
         ]
       },
-      {
-        kind: 'category', name: '# values', colour: '#1a4a0a',
-        contents: [
-          { kind: 'block', type: 'p5_mousex' },
-          { kind: 'block', type: 'p5_mousey' },
-          { kind: 'block', type: 'math_number' },
-          { kind: 'block', type: 'math_arithmetic' },
-          { kind: 'block', type: 'p5_random',
-            inputs: {
-              MIN: { shadow: { type: 'math_number', fields: { NUM: 0   } } },
-              MAX: { shadow: { type: 'math_number', fields: { NUM: 400 } } },
-            }},
-        ]
-      },
     ]
   },
 
@@ -54,6 +46,11 @@ const TOOLBOXES = {
         kind: 'category', name: '⚙ animation', colour: '#1a7a0a',
         contents: [
           { kind: 'block', type: 'p5_setup' },
+          { kind: 'block', type: 'p5_create_canvas',
+            inputs: {
+              W: { shadow: { type: 'math_number', fields: { NUM: 400 } } },
+              H: { shadow: { type: 'math_number', fields: { NUM: 400 } } },
+            }},
           { kind: 'block', type: 'p5_draw'  },
           { kind: 'block', type: 'p5_framerate',
             inputs: { RATE: { shadow: { type: 'math_number', fields: { NUM: 30 } } } } },
@@ -108,31 +105,53 @@ const TOOLBOXES = {
 /* ── Engine state ───────────────────────────────────────────── */
 const ENGINE = {
   levelIndex: 0,
+  stepIndex: 0,
   level: null,
   workspace: null,
   codeEditor: null,
   blocks: new Set(),
   code: '',
   aiUsed: false,
+  loading: false,
 };
+
+/* ── Returns the active step object (or level itself if no steps) ── */
+function engineCurrentStep() {
+  const lv = ENGINE.level;
+  if (!lv) return null;
+  if (lv.steps?.length) return lv.steps[ENGINE.stepIndex];
+  return lv;
+}
 
 /* ── Start a level ──────────────────────────────────────────── */
 function engineLoad(index) {
   ENGINE.levelIndex = index;
+  ENGINE.stepIndex  = 0;
   ENGINE.level      = LEVELS[index];
-  ENGINE.aiUsed     = false;
   document.getElementById('btn-next-level').classList.remove('active');
+  document.getElementById('level-title').textContent = ENGINE.level.title;
 
-  const lv = ENGINE.level;
+  // Reset workspace once at level start
+  ENGINE.loading = true;
+  ENGINE.workspace.clear();
+  const firstStep = engineCurrentStep();
+  if (firstStep?.initialBlocks) {
+    Blockly.serialization.workspaces.load(firstStep.initialBlocks, ENGINE.workspace);
+  }
+  setTimeout(() => { ENGINE.loading = false; }, 100);
 
-  // narrative
-  setNarrative(lv.story, lv.task);
-  setBugList(lv.type === 'debug' ? lv.bugs : []);
+  engineLoadStep(firstStep);
+  updateProgress();
+}
 
-  // header title
-  document.getElementById('level-title').textContent = lv.title;
+/* ── Load a step (called on level start and every step advance) ── */
+function engineLoadStep(step) {
+  ENGINE.aiUsed = false;
 
-  // show/hide left-pane sections
+  setNarrative(step.story, step.task);
+  updateStepIndicator();
+  setBugList(step.type === 'debug' ? (step.bugs || []) : []);
+
   const blocksSection = document.getElementById('blockly-section');
   const aiSection     = document.getElementById('ai-section');
   const endSection    = document.getElementById('end-section');
@@ -141,75 +160,108 @@ function engineLoad(index) {
   aiSection.classList.add('hidden');
   endSection.classList.add('hidden');
 
-  if (lv.type === 'blocks') {
+  if (step.type === 'blocks') {
     blocksSection.classList.remove('hidden');
-    ENGINE.workspace.updateToolbox(TOOLBOXES[lv.toolbox] || TOOLBOXES.basic);
-    ENGINE.workspace.clear();
-  } else if (lv.type === 'ai-trap') {
+    ENGINE.workspace.updateToolbox(TOOLBOXES[step.toolbox] || TOOLBOXES.basic);
+    ENGINE.codeEditor.setOption('readOnly', true);
+  } else if (step.type === 'code') {
+
+    //#todo
+    blocksSection.classList.remove('hidden');
+    ENGINE.workspace.updateToolbox(TOOLBOXES.basic);
+    ENGINE.codeEditor.setOption('readOnly', false);
+
+
+
+   } else if (step.type === 'ai-trap') {
     aiSection.classList.remove('hidden');
-  } else if (lv.type === 'debug') {
-    // load the AI code into the editor
-    ENGINE.codeEditor.setValue(LEVELS[index - 1]?.aiCode || '');
+    // reset the AI button so it can be clicked again
+    const btn = document.getElementById('btn-ask-ai');
+    btn.disabled = false;
+    const log = document.getElementById('ai-log');
+    log.innerHTML = '';
+    log.classList.add('hidden');
+    ENGINE.codeEditor.setOption('readOnly', true);
+  } else if (step.type === 'debug') {
+    ENGINE.codeEditor.setValue(step.aiCode || '');
     ENGINE.codeEditor.setOption('readOnly', false);
     runnerRun(ENGINE.codeEditor.getValue());
-  } else if (lv.type === 'end') {
+  } else if (step.type === 'end') {
     endSection.classList.remove('hidden');
-    setNarrative(lv.story, '');
+    ENGINE.codeEditor.setOption('readOnly', true);
   }
-
-  // code pane readonly for non-debug levels
-  if (lv.type !== 'debug') {
-    ENGINE.codeEditor.setOption('readOnly', lv.type !== 'end');
-  }
-
-  updateProgress();
 }
 
 /* ── Called by workspace change listener ───────────────────── */
 function engineOnBlocksChange(blocks, code) {
   ENGINE.blocks = blocks;
   ENGINE.code   = code;
-  if (ENGINE.level?.type === 'blocks') engineCheck();
+  if (engineCurrentStep()?.type === 'blocks') engineCheck();
 }
 
 /* ── Called by code editor change ──────────────────────────── */
 function engineOnCodeChange(code) {
   ENGINE.code = code;
-  if (ENGINE.level?.type === 'debug') {
+  const type = engineCurrentStep()?.type;
+  if (type === 'debug') {
     updateBugChecks(code);
+    engineCheck();
+  } else if (type === 'code') {
     engineCheck();
   }
 }
 
 /* ── Check win condition ────────────────────────────────────── */
 function engineCheck() {
+  if (ENGINE.loading) return;
   const lv = ENGINE.level;
   if (!lv) return;
-  const passed = lv.check(ENGINE.blocks, ENGINE.code, ENGINE);
-  if (passed) engineWin();
+  const step = engineCurrentStep();
+  const passed = step.check(ENGINE.blocks, ENGINE.code, ENGINE);
+  if (passed) engineStepPass();
+}
+
+function engineStepPass() {
+  const lv       = ENGINE.level;
+  const step     = engineCurrentStep();
+  const hasSteps = lv.steps?.length > 0;
+
+  if (hasSteps && ENGINE.stepIndex < lv.steps.length - 1) {
+    // intermediate step: show win message, then load next step
+    if (step.win) showWinMessage(step.win);
+    ENGINE.stepIndex++;
+    engineLoadStep(engineCurrentStep());
+  } else {
+    // last step: show step win briefly, then level win + unlock button
+    if (step.win) {
+      showWinMessage(step.win);
+      setTimeout(engineWin, 4800);
+    } else {
+      engineWin();
+    }
+  }
 }
 
 function engineWin() {
   const lv = ENGINE.level;
-  showWinMessage(lv.win);
+  if (lv.win) showWinMessage(lv.win);
   document.getElementById('btn-next-level').classList.add('active');
 }
 
-/* ── AI injection (level type: ai-trap) ─────────────────────── */
+/* ── AI injection (step type: ai-trap) ──────────────────────── */
 function engineAskAI() {
-  const lv = ENGINE.level;
-  if (lv.type !== 'ai-trap') return;
+  const step = engineCurrentStep();
+  if (step?.type !== 'ai-trap') return;
 
   const btn = document.getElementById('btn-ask-ai');
   btn.disabled = true;
 
-  // show fake typing messages
   const log = document.getElementById('ai-log');
   log.innerHTML = '';
   log.classList.remove('hidden');
 
   let i = 0;
-  const msgs = lv.aiTyping || ['thinking...', 'done.'];
+  const msgs = step.aiTyping || ['thinking...', 'done.'];
   const tick = setInterval(() => {
     if (i < msgs.length) {
       const line = document.createElement('div');
@@ -218,14 +270,26 @@ function engineAskAI() {
       log.scrollTop = log.scrollHeight;
     } else {
       clearInterval(tick);
-      // inject the buggy code
-      ENGINE.codeEditor.setValue(lv.aiCode);
+      ENGINE.codeEditor.setValue(step.aiCode);
       ENGINE.codeEditor.setOption('readOnly', true);
-      runnerRun(lv.aiCode);
+      runnerRun(step.aiCode);
       ENGINE.aiUsed = true;
       engineCheck();
     }
   }, 600);
+}
+
+/* ── Step indicator (shown below task text when level has steps) ─ */
+function updateStepIndicator() {
+  const lv = ENGINE.level;
+  const el = document.getElementById('step-indicator');
+  if (!el) return;
+  if (lv?.steps?.length > 1) {
+    el.textContent = 'step ' + (ENGINE.stepIndex + 1) + ' / ' + lv.steps.length;
+    el.classList.remove('hidden');
+  } else {
+    el.classList.add('hidden');
+  }
 }
 
 /* ── Progress bar ───────────────────────────────────────────── */
@@ -238,9 +302,9 @@ function updateProgress() {
 
 /* ── Bug checklist (debug levels) ──────────────────────────── */
 function updateBugChecks(code) {
-  const lv = ENGINE.level;
-  if (lv?.type !== 'debug') return;
-  lv.bugs.forEach((bug) => {
+  const step = engineCurrentStep();
+  if (step?.type !== 'debug') return;
+  (step.bugs || []).forEach((bug) => {
     const el = document.getElementById('bug-' + bug.id);
     if (!el) return;
     const fixed = bug.check(code);
@@ -280,5 +344,5 @@ function showWinMessage(msg) {
   el.innerHTML = msg.split('\n').map(l => `<div>${l}</div>`).join('');
   el.classList.remove('hidden');
   clearTimeout(winTimer);
-  winTimer = setTimeout(() => el.classList.add('hidden'), 2400);
+  winTimer = setTimeout(() => el.classList.add('hidden'), 10400);
 }

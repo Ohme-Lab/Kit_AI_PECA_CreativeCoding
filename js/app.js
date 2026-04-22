@@ -17,11 +17,12 @@ function initBlockly() {
 
   ENGINE.workspace.addChangeListener((e) => {
     if (e.isUiEvent) return;
+    if (ENGINE.workspace.isDragging()) return;
     const blocks = new Set();
     ENGINE.workspace.getAllBlocks(false).forEach(b => blocks.add(b.type));
     const code = generateSketchCode(ENGINE.workspace) || '';
-    // update code pane if not debug level
-    if (ENGINE.level?.type === 'blocks') {
+    // update code pane for blocks steps
+    if (engineCurrentStep()?.type === 'blocks') {
       ENGINE.codeEditor.setValue(code);
       runnerRun(code);
     }
@@ -74,7 +75,8 @@ function initCodeEditor() {
     if (obj.origin === 'setValue') return;
     engineOnCodeChange(ENGINE.codeEditor.getValue());
     // live-reload sketch while debugging
-    if (ENGINE.level?.type === 'debug') {
+    const t = engineCurrentStep()?.type;
+    if (t === 'debug' || t === 'code') {
       runnerRun(ENGINE.codeEditor.getValue());
     }
   });

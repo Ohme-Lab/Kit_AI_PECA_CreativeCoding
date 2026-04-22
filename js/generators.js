@@ -7,9 +7,17 @@ const jsGen = (typeof Blockly !== 'undefined' && Blockly.JavaScript)
   ? Blockly.JavaScript
   : null;
 
+function hexToRgb(hex) {
+  // hex is a JS string literal like "'#39ff14'" — strip quotes then parse
+  const m = hex.match(/['"]#([0-9a-fA-F]{6})['"]/);
+  if (!m) return hex;
+  const n = parseInt(m[1], 16);
+  return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`;
+}
+
 function colorArg(block, name, fallback = "'#ffffff'") {
-  if (!jsGen) return fallback;
-  return jsGen.valueToCode(block, name, jsGen.ORDER_ATOMIC) || fallback;
+  if (!jsGen) return hexToRgb(fallback);
+  return hexToRgb(jsGen.valueToCode(block, name, jsGen.ORDER_ATOMIC) || fallback);
 }
 function numArg(block, name, fallback = '0') {
   if (!jsGen) return fallback;
@@ -24,7 +32,13 @@ function stmtArg(block, name) {
 
 jsGen['p5_setup'] = function(block) {
   const body = stmtArg(block, 'BODY');
-  return `function setup() {\n  createCanvas(400, 400);\n${body}}\n`;
+  return `function setup() {\n${body}}\n`;
+};
+
+jsGen['p5_create_canvas'] = function(block) {
+  const w = numArg(block, 'W', '400');
+  const h = numArg(block, 'H', '400');
+  return `createCanvas(${w}, ${h});\n`;
 };
 
 jsGen['p5_draw'] = function(block) {

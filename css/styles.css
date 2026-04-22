@@ -195,6 +195,12 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
   border-top: 1px dashed var(--border);
   padding-top: 8px;
 }
+#step-indicator {
+  margin-top: 6px;
+  color: var(--green-dim);
+  font-size: 10px;
+  letter-spacing: .08em;
+}
 
 .win-msg {
   margin-top: 10px;
