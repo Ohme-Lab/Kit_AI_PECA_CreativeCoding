@@ -127,7 +127,7 @@ function engineCurrentStep() {
 /* ── Start a level ──────────────────────────────────────────── */
 function engineLoad(index) {
   ENGINE.levelIndex = index;
-  ENGINE.stepIndex  = 6;
+  ENGINE.stepIndex  = 0;
   ENGINE.level      = LEVELS[index];
   document.getElementById('btn-next-level').classList.remove('active');
   document.getElementById('level-title').textContent = ENGINE.level.title;
