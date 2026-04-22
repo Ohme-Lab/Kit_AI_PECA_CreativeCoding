@@ -1,59 +1,74 @@
 LEVELS.push({
   id: 3,
-  title: '03 / ask the AI, then fix it',
-  win: '> all bugs fixed. it works.\n> the AI wrote 80 lines in 2 seconds.\n> you fixed them in 10 minutes.\n> that\'s the deal.',
+  title: "03 / game of life",
   steps: [
     {
-      type: 'ai-trap',
+      type: 'code',
       story: [
-        '> okay. next challenge: Conway\'s Game of Life.',
-        '> cells live or die based on their neighbors.',
-        '> 1600 cells. wrapping grid. sounds hard.',
-        '> ...',
-        '> or you could just ask AI.',
+        "> Conway's Game of Life.",
+        "> 1600 cellules. Chaque cellule vit ou meurt selon ses voisines.",
+        "> Le programme tourne tout seul.",
       ],
-      task: 'click [ASK AI] to generate the code automatically',
-      aiTyping: [
-        'analyzing request...',
-        'generating optimal solution...',
-        'adding best practices...',
-        'done! here\'s your Game of Life ✓',
-      ],
-      aiCode: getBuggyGameOfLife(),
-      check: (s, code, engine) => engine.aiUsed === true,
-      win: '> wow, AI wrote 80 lines instantly. surely it works.',
-    },
-    {
-      type: 'debug',
-      aiCode: getBuggyGameOfLife(),
-      story: [
-        '> it does not work.',
-        '> the AI introduced 3 bugs.',
-        '> find and fix them all.',
-      ],
-      task: 'fix 3 bugs — the output pane will show when it\'s working',
-      bugs: [
-        {
-          id: 'typo',
-          hint: 'bug 1 — there\'s a typo in a variable name (line ~14)',
-          check: (code) => !code.includes('widht'),
-        },
-        {
-          id: 'self',
-          hint: 'bug 2 — the neighbor count includes the cell itself',
-          check: (code) => code.includes('if (di===0 && dj===0) continue'),
-        },
-        {
-          id: 'swap',
-          hint: 'bug 3 — the grid never actually updates (look for a commented line)',
-          check: (code) => !code.match(/\/\/.*\[grid.*nextGrid\]|\/\/.*nextGrid.*grid/),
-        },
-      ],
-      check: (s, code) =>
-        !code.includes('widht') &&
-        code.includes('if (di===0 && dj===0) continue') &&
-        !code.match(/\/\/.*\[grid.*nextGrid\]|\/\/.*nextGrid.*grid/),
-      win: '> 3/3. it runs. you understood code that AI got wrong.',
+      task: 'Observe. Tu peux cliquer sur le canvas pour ajouter des cellules.',
+      aiCode: `let grid, nextGrid, cols, rows;
+const CELL = 12;
+
+function setup() {
+  createCanvas(400, 400);
+  cols = floor(width / CELL);
+  rows = floor(height / CELL);
+  grid     = makeGrid();
+  nextGrid = makeGrid();
+  for (let i = 0; i < cols; i++)
+    for (let j = 0; j < rows; j++)
+      grid[i][j] = random() < 0.3 ? 1 : 0;
+  frameRate(12);
+}
+
+function draw() {
+  background(8);
+  noStroke();
+  fill(57, 255, 20);
+  for (let i = 0; i < cols; i++)
+    for (let j = 0; j < rows; j++)
+      if (grid[i][j])
+        rect(i * CELL + 1, j * CELL + 1, CELL - 2, CELL - 2);
+
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      const n = countNeighbors(i, j);
+      if (grid[i][j]) {
+        nextGrid[i][j] = (n === 2 || n === 3) ? 1 : 0;
+      } else {
+        nextGrid[i][j] = (n === 3) ? 1 : 0;
+      }
+    }
+  }
+  [grid, nextGrid] = [nextGrid, grid];
+}
+
+function countNeighbors(x, y) {
+  let sum = 0;
+  for (let di = -1; di <= 1; di++) {
+    for (let dj = -1; dj <= 1; dj++) {
+      if (di === 0 && dj === 0) continue;
+      sum += grid[(x + di + cols) % cols][(y + dj + rows) % rows];
+    }
+  }
+  return sum;
+}
+
+function makeGrid() {
+  return Array.from({ length: cols }, () => new Array(rows).fill(0));
+}
+
+function mousePressed() {
+  const col = floor(mouseX / CELL);
+  const row = floor(mouseY / CELL);
+  if (col >= 0 && col < cols && row >= 0 && row < rows)
+    grid[col][row] = grid[col][row] ? 0 : 1;
+}`,
+      check: () => false, // showcase — no win condition
     },
   ],
 });

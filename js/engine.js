@@ -216,8 +216,13 @@ function engineLoadStep(step) {
     
   } else if (step.type === 'code') {
     ENGINE.codeEditor.setOption('readOnly', false);
+    if (step.aiCode) {
+      const code = typeof step.aiCode === 'function' ? step.aiCode(ENGINE.codeEditor.getValue()) : step.aiCode;
+      ENGINE.codeEditor.setValue(code);
+      runnerRun(code);
+    }
 
-   } else if (step.type === 'ai-trap') {
+  } else if (step.type === 'ai-trap') {
     aiSection.classList.remove('hidden');
     // reset the AI button so it can be clicked again
     const btn = document.getElementById('btn-ask-ai');
