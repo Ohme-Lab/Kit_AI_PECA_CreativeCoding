@@ -7,8 +7,8 @@ const SKETCH_HTML = (code) => `<!DOCTYPE html>
 <html><head><meta charset="UTF-8">
   <style>
     *{margin:0px;padding:2px}
-    body{background:#080808;overflow:hidden ; center; display:flex;align-items:center;justify-content:center}
-    canvas{outline:1px solid #39ff14}
+    body{background:#fff;overflow:hidden ; center; display:flex;align-items:center;justify-content:center}
+    canvas{outline:2px solid #d97b0d}
   </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"><\/script>
 </head><body>

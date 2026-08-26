@@ -161,7 +161,7 @@ Définis dans `blocks.js`, générateurs dans `generators.js` :
 ---
 
 ## Ce qui manque / TODO
-
+[Addition humaine 26 aout : pas hyper actuel, certains trucs ont été fait, et les prio ont été revues depuis, section à skip]
 ### Bugs connus (post-présentation Namur)
 - [ ] Faute de frappe "dessinner" dans un texte
 - [ ] Canvas pas centré dans la fenêtre / pas noir par défaut

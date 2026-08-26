@@ -8,7 +8,7 @@
 function initBlockly() {
   ENGINE.workspace = Blockly.inject('blockly-div', {
     toolbox:  TOOLBOXES.basic,
-    grid:     { spacing: 20, length: 3, colour: '#1a3a0a', snap: true },
+    grid:     { spacing: 20, length: 3, colour: 'rgba(17,17,17,.08)', snap: true },
     trashcan: true,
     zoom:     { controls: true, wheel: true, startScale: 0.95 },
     theme:    buildBlocklyTheme(),
@@ -35,14 +35,14 @@ function buildBlocklyTheme() {
     return Blockly.Theme.defineTheme('tui', {
       base: Blockly.Themes.Zelos,
       componentStyles: {
-        workspaceBackgroundColour: '#080808',
-        toolboxBackgroundColour:   '#0d0d0d',
-        toolboxForegroundColour:   '#a0d890',
-        flyoutBackgroundColour:    '#111111',
-        flyoutForegroundColour:    '#a0d890',
+        workspaceBackgroundColour: '#fff',
+        toolboxBackgroundColour:   '#f5f5f3',
+        toolboxForegroundColour:   '#111111',
+        flyoutBackgroundColour:    '#ebebea',
+        flyoutForegroundColour:    '#111111',
         flyoutOpacity:             0.98,
-        scrollbarColour:           '#1a3a0a',
-        insertionMarkerColour:     '#39ff14',
+        scrollbarColour:           'rgba(17,17,17,.2)',
+        insertionMarkerColour:     '#d97b0d',
       },
     });
   } catch (_) { return Blockly.Themes.Zelos; }
@@ -53,7 +53,7 @@ function initCodeEditor() {
   ENGINE.codeEditor = CodeMirror.fromTextArea(
     document.getElementById('code-editor'), {
       mode: 'javascript',
-      theme: 'dracula',
+      theme: 'default',
       lineNumbers: true,
       tabSize: 2,
       indentWithTabs: false,
