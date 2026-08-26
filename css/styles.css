@@ -64,18 +64,11 @@ html, body {
 #app-header > *:last-child { border-right: none; }
 
 #brand         { gap: 6px; }
-.logo          { color: var(--green); font-size: 14px; }
-.app-title     { color: var(--green); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+.logo          { color: var(--green); font-size: 15px; }
+.app-title     { color: var(--green); font-size: 15px; letter-spacing: .1em; text-transform: uppercase; }
 
-#level-title-wrap { flex: 1; }
-#level-title {
-  color: var(--green-hi);
-  font-size: 12px;
-  letter-spacing: .06em;
-  font-weight: 700;
-}
 
-button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size: 11px; }
+button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size: 19px; }
 
 .ctrl-btn {
   background: var(--bg3);
@@ -96,7 +89,7 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
 /* progress bar in header */
 #header-progress {
   gap: 8px;
-  min-width: 130px;
+  flex: 1;
 }
 #progress-track {
   flex: 1;
@@ -110,8 +103,39 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
   transition: width .4s;
 }
 #progress-label { font-size: 10px; color: var(--text-dim); white-space: nowrap; }
-
-#level-nav { gap: 2px; }
+/* ── Mission nav (level title in header + step buttons in pane) ── */
+#mission-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--bg2);
+  gap: 8px;
+  flex: 1;
+}
+#level-nav {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+}
+#level-nav .ctrl-btn {
+  font-size: 11px;
+  padding: 2px 6px;
+  border: none;
+  border-right: 1px solid var(--border);
+}
+#level-title {
+  color: var(--green-hi);
+  font-size: 15px;
+  letter-spacing: .06em;
+  font-weight: 700;
+  white-space: nowrap;
+}
 
 /* ── Three-pane layout ───────────────────────────────────────── */
 #app-main {
@@ -157,7 +181,7 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
 }
 .pane-label {
   padding: 0 10px;
-  font-size: 10px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--green);
   text-transform: uppercase;
@@ -194,12 +218,12 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
 .story-line {
   color: var(--text);
   line-height: 1.9;
-  font-size: 11px;
+  font-size: 16px;
   white-space: pre-wrap;
 }
 #task-text {
   margin-top: 10px;
-  font-size: 10px;
+  font-size: 15px;
   line-height: 1.7;
   border-top: 1px dashed var(--border);
   padding-top: 8px;
@@ -214,14 +238,14 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
 #step-indicator {
   margin-top: 6px;
   color: var(--bone-white);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: .08em;
 }
 
 .win-msg {
   margin-top: 10px;
   color: var(--green);
-  font-size: 11px;
+  font-size: 20px;
   line-height: 1.8;
   background: var(--green-glow);
   border: 1px solid var(--bone-white);
@@ -236,7 +260,7 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
   color: var(--green);
   padding: 3px 10px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 15px;
   letter-spacing: .06em;
   width: 100%;
   text-align: left;
@@ -272,7 +296,7 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
   border: 2px solid var(--green);
   color: var(--green);
   font-family: var(--mono);
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   padding: 14px 28px;
   cursor: pointer;
@@ -292,9 +316,9 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
 .ai-log {
   width: 100%;
   color: var(--text-dim);
-  font-size: 10px;
+  font-size: 15px;
   line-height: 1.8;
-  max-height: 100px;
+  max-height: 300px;
   overflow-y: auto;
   border: 1px solid var(--border);
   padding: 6px 8px;
@@ -309,7 +333,7 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
 }
 .section-label {
   color: var(--text-dim);
-  font-size: 10px;
+  font-size: 15px;
   margin-bottom: 8px;
 }
 .bug-item {
@@ -317,7 +341,7 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
   gap: 8px;
   align-items: flex-start;
   margin-bottom: 8px;
-  font-size: 10px;
+  font-size: 15px;
   color: var(--text-dim);
   line-height: 1.6;
   transition: color .2s;
@@ -325,7 +349,7 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
 .bug-status { color: var(--red); flex-shrink: 0; }
 .bug-item.bug-fixed { color: var(--green-mid); }
 .bug-item.bug-fixed .bug-status { color: var(--green); }
-.err-line { font-size: 10px; color: var(--red); margin-top: 6px; min-height: 14px; }
+.err-line { font-size: 20px; color: var(--red); margin-top: 6px; min-height: 14px; }
 
 /* End section */
 #end-section {
@@ -340,7 +364,7 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
 #pane-code { position: relative; }
 
 .info-banner, .error-banner {
-  font-size: 10px;
+  font-size: 15px;
   padding: 3px 10px;
   flex-shrink: 0;
 }
@@ -349,7 +373,7 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
 
 .CodeMirror {
   font-family: var(--mono) !important;
-  font-size: 11px;
+  font-size: 15px;
   line-height: 1.65;
   background: var(--bg) !important;
 }

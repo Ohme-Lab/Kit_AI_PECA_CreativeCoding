@@ -109,7 +109,7 @@ Blockly.Blocks['p5_no_fill'] = {
 
 Blockly.Blocks['p5_circle'] = {
   init() {
-    this.appendDummyInput().appendField('Dessinner un cercle');
+    this.appendDummyInput().appendField('Dessiner un cercle');
     this.appendValueInput('X').setCheck('Number').appendField('x');
     this.appendValueInput('Y').setCheck('Number').appendField('y');
     this.appendValueInput('SIZE').setCheck('Number').appendField('size');

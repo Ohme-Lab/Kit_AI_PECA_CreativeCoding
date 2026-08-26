@@ -6,11 +6,10 @@
   "scripts": {
     "dev":   "npx serve . -p 3000",
     "build": "echo 'Static site — no build step needed'",
-    "deploy": "vercel --prod"
+    "build": "echo 'Static site — no build step needed'"
   },
   "devDependencies": {
-    "serve": "^14.2.1",
-    "vercel": "^33.0.0"
+    "serve": "^14.2.1"
   },
   "engines": {
     "node": ">=18"
