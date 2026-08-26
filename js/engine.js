@@ -190,6 +190,7 @@ function engineLoad(index) {
 
   engineLoadStep(firstStep);
   updateProgress();
+  showTutorial(ENGINE.level.tutorial, { closeLabel: '[ commencer ]' });
 }
 
 /* ── Load a step (called on level start and every step advance) ── */
@@ -244,6 +245,8 @@ function engineLoadStep(step) {
     endSection.classList.remove('hidden');
     ENGINE.codeEditor.setOption('readOnly', true);
   }
+
+  showTutorial(step.tutorial);
 }
 
 /* ── Called by workspace change listener ───────────────────── */

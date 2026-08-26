@@ -3,18 +3,31 @@
    Extracted from app.js so engine.js can call it cleanly.
    ═══════════════════════════════════════════════════════════════ */
 
-const SKETCH_HTML = (code) => `<!DOCTYPE html>
+// Marker used to auto-compute how many lines precede student code in the blob.
+// If the template changes, the offset recalculates itself automatically.
+const _CODE_MARKER = '/*__CODE_START__*/';
+
+function _buildHTML(code, offset) {
+  return `<!DOCTYPE html>
 <html><head><meta charset="UTF-8">
   <style>
-    *{margin:0px;padding:2px}
-    body{background:#fff;overflow:hidden ; center; display:flex;align-items:center;justify-content:center}
-    canvas{outline:2px solid #d97b0d}
+    *{margin:0;padding:0}
+    body{background:#fff;overflow:hidden;display:flex;align-items:center;justify-content:center}
+    canvas{outline:1px solid rgba(17,17,17,.12)}
   </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"><\/script>
 </head><body>
 <script>
-window.onerror = function(msg, _src, line) {
-  window.parent.postMessage({ type: 'error', message: msg + ' (line ' + line + ')' }, '*');
+window.__codeOffset = ${offset};
+window.onerror = function(msg, src, line) {
+  var isP5 = src && src.indexOf('cdnjs.cloudflare.com') !== -1;
+  var cleanMsg = msg.replace(/blob:[^\s)"]+/g, '').trim();
+  if (isP5) {
+    window.parent.postMessage({ type: 'error', message: cleanMsg + ' (erreur interne p5.js)' }, '*');
+  } else {
+    var studentLine = Math.max(1, line - window.__codeOffset);
+    window.parent.postMessage({ type: 'error', message: cleanMsg + ' — ligne ' + studentLine }, '*');
+  }
   return true;
 };
 <\/script>
@@ -37,6 +50,15 @@ setInterval(function() {
 }, 1000);
 <\/script>
 </body></html>`;
+}
+
+// Lines in the blob before student code — computed once from the template itself.
+const _CODE_OFFSET = (() => {
+  const probe = _buildHTML(_CODE_MARKER, 0);
+  return probe.slice(0, probe.indexOf(_CODE_MARKER)).split('\n').length - 1;
+})();
+
+const SKETCH_HTML = (code) => _buildHTML(code, _CODE_OFFSET);
 
 let _blobUrl = null;
 
@@ -72,11 +94,10 @@ window.addEventListener('message', (e) => {
   }
   if (e.data.type === 'error') {
     const el = document.getElementById('error-banner');
-    if (el) { el.textContent = '// ERR: ' + e.data.message; el.classList.remove('hidden'); }
-    // also flag in engine if debug level
+    if (el) { el.textContent = '// ' + e.data.message; el.classList.remove('hidden'); }
     if (ENGINE?.level?.type === 'debug') {
       const errLine = document.getElementById('err-indicator');
-      if (errLine) errLine.textContent = '// ERR: ' + e.data.message;
+      if (errLine) errLine.textContent = '// ' + e.data.message;
     }
   }
 });

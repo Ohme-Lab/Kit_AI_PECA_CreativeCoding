@@ -105,6 +105,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
 
+  <script src="js/tutorial.js"></script>
   <script src="js/blocks.js"></script>
   <script src="js/generators.js"></script>
   <script src="js/levels.js"></script>
@@ -114,5 +115,22 @@
   <script src="js/runner.js"></script>
   <script src="js/engine.js"></script>
   <script src="js/app.js"></script>
+
+  <!-- ── Tutorial modal ── -->
+  <div id="tutorial-modal" class="hidden">
+    <div class="tuto-backdrop"></div>
+    <div class="tuto-card">
+      <div class="tuto-header">
+        <span class="tuto-title"></span>
+        <span class="tuto-counter"></span>
+      </div>
+      <div class="tuto-body"></div>
+      <div class="tuto-nav">
+        <button class="ctrl-btn hidden" id="tuto-prev">[ &lt; précédent ]</button>
+        <button class="ctrl-btn" id="tuto-next">[ commencer ]</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

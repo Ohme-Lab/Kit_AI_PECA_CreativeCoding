@@ -412,6 +412,145 @@ button { font-family: var(--mono); border-radius: 0; cursor: pointer; font-size:
 /* readonly CodeMirror slightly dimmed */
 .CodeMirror.CodeMirror-readonly { opacity: .75; }
 
+/* ── Tutorial modal ─────────────────────────────────────────── */
+#tutorial-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+.tuto-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(17,17,17,.45);
+}
+.tuto-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  max-width: 560px;
+  width: 90%;
+  padding: 28px 32px;
+  z-index: 101;
+  font-family: var(--sans);
+}
+.tuto-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+}
+.tuto-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+.tuto-counter {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: .1em;
+}
+
+/* Body — cleared and repopulated per slide */
+.tuto-body {
+  margin-bottom: 24px;
+}
+
+/* image (created by tutorial.js when slide.image is set) */
+.tuto-img {
+  display: block;
+  width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  margin-bottom: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+}
+
+/* text / html paragraph */
+.tuto-text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-dim);
+}
+.tuto-text + .tuto-text { margin-top: 10px; }
+/* common inline elements inside html slides */
+.tuto-text strong { color: var(--text); font-weight: 600; }
+.tuto-text code   { font-family: var(--mono); font-size: 12px;
+                    background: var(--bg3); padding: 1px 5px; }
+
+/* code block (used inside html slides via <pre class="tuto-code">) */
+.tuto-code {
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.7;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  padding: 12px 14px;
+  overflow-x: auto;
+  white-space: pre;
+  color: var(--text);
+  margin-top: 12px;
+}
+
+/* ── RGB interactive slide ───────────────────────────────────── */
+.tuto-rgb {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.tuto-rgb-row {
+  display: grid;
+  grid-template-columns: 14px 1fr 32px;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.tuto-rgb-row input[type=range] {
+  width: 100%;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.tuto-rgb-row span { text-align: right; color: var(--text); }
+.tuto-rgb-preview {
+  height: 48px;
+  border: 1px solid var(--border);
+  margin-top: 4px;
+  transition: background .08s;
+}
+.tuto-rgb-code {
+  display: block;
+  font-family: var(--mono);
+  font-size: 13px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  color: var(--accent-mid);
+  letter-spacing: .02em;
+}
+
+/* Nav buttons */
+.tuto-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.tuto-nav .ctrl-btn {
+  font-size: 13px;
+  padding: 4px 12px;
+}
+#tuto-next { margin-left: auto; color: var(--accent); border-color: var(--accent); }
+#tuto-next:hover { background: var(--accent); color: var(--bg); }
+
 /* ── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 800px) {
   #app-main   { flex-direction: column; }
